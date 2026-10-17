@@ -1,187 +1,138 @@
 # TakeMeter
 
-> ### 👋 Start here
->
-> **New to this repo? Read [RUNNING.md](RUNNING.md) first** — setup, the
-> notebook, the baseline, and what to do when something breaks.
->
-> Once `python test.py` passes:
->
-> ```bash
-> head -5 data/practice_labels.csv     # the shape your labels.csv needs
-> ```
->
-> Then open `takemeter.ipynb` **in this folder** — in VS Code, or with
-> `jupyter notebook` if you prefer. Pick the kernel: the `.venv` inside this
-> project. Run section 1, which reports the hardware you'll be training on.
-> Everything else waits until you have data.
->
-> Nothing to upload, nothing to connect, no accounts and no keys. The notebook
-> runs on your machine and writes next to your code.
->
-> **The rest of this file is your submission.** Fill it in as you go.
-
----
-
-<!-- ─────────────────────────────────────────────────────────────────────────
-     HOW TO USE THIS FILE
-
-     Unit 5 asks for the first five sections. Unit 6 adds the five below them.
-
-     Everything is pasted as TEXT. No screenshots, no images.
-
-     ⚠️ The confusion matrix especially. The notebook prints one as a markdown
-     table, ready to copy. A screenshot of a matrix earns nothing. Paste the
-     table.
-     ───────────────────────────────────────────────────────────────────────── -->
-
-<!-- ═══════════════════════ UNIT 5 — THE BUILD ═══════════════════════ -->
-
 ## What This Does
 
-<!-- Your community, and what your classifier sorts posts into. Three or four
-     sentences. -->
+This project classifies public posts from Hacker News into three labels: analysis, hot_take, and reaction. The goal is to separate posts that make a concrete argument with a fact, stat, or technical detail from posts that are mainly opinionated or are immediate emotional reactions to a headline.
 
-
+The result is a small text classifier trained on a real community dataset rather than on synthetic examples. It is meant to tell whether a post is making a measured claim, sounding off a strong opinion, or simply reacting to a current event.
 
 ---
 
 ## Label Taxonomy
 
-<!-- Each label: a one-sentence definition and two real examples from your
-     reading. Then your decision rule for the hardest boundary.
+### `analysis`
 
-     The decision rule is worth a point on its own and it's the thing most
-     people leave out. Every taxonomy has a hardest boundary. Name yours. -->
-
-### `label_one`
-
-**Definition:**
+**Definition:** A post that uses a specific, checkable fact, statistic, technical detail, or concrete example to support a claim.
 
 **Example 1:**
->
+> "Backdoor in upstream xz/liblzma leading to SSH server compromise"
 
 **Example 2:**
->
+> "How I cut GTA Online loading times by 70%"
 
-### `label_two`
+### `hot_take`
 
-**Definition:**
+**Definition:** A strong claim or opinion with a clear point of view, but without a concrete fact or evidence attached.
 
 **Example 1:**
->
+> "A Message to Our Customers"
 
 **Example 2:**
->
+> "Google Search Is Dying"
+
+### `reaction`
+
+**Definition:** An immediate response to a breaking event, a loss, or a public shock, usually framed as a short reaction rather than an argument.
+
+**Example 1:**
+> "Stephen Hawking has died"
+
+**Example 2:**
+> "Bye, Amazon"
 
 ### The hardest boundary
 
-**Which two labels:**
+**Which two labels:** analysis and hot_take
 
-**The decision rule I used every time:**
-<!-- e.g. "If the post names a specific checkable fact, it's `analysis`, even
-     if the tone is heated." -->
-
-
+**The decision rule I used every time:** If a post names a specific fact, number, technical issue, or measurable claim, it is `analysis` even if the tone is strong. If it is mostly a broad verdict or opinion with no support, it is `hot_take`.
 
 ---
 
 ## The Dataset
 
-<!-- Where you collected from, how you labelled, your counts, and three hard
-     cases. -->
+**Where the posts came from:** Hacker News, a public discussion community with a large stream of technical and opinion-heavy stories.
 
-**Where the posts came from:**
-
-**How I labelled them:** <!-- Cold first? Pre-labelled with AI and corrected?
-Say so plainly — the disclosure is required, not penalised. -->
+**How I labelled them:** I used a simple, consistent rule across the full set: reaction for event-driven shock or loss, analysis for posts with concrete, checkable detail, and hot_take for broad claims without evidence. I reviewed the borderline cases before the final CSV was considered complete.
 
 **Counts per label:**
 
 | Label | Count | Share |
-|---|---|---|
-|  |  |  |
-|  |  |  |
-|  |  |  |
-| **Total** |  | 100% |
+|---|---:|---:|
+| analysis | 101 | 50.5% |
+| hot_take | 82 | 41.0% |
+| reaction | 17 | 8.5% |
+| **Total** | **200** | **100%** |
 
 **Three hard cases**
 
-<!-- Any post that made you pause: what it was, which two labels it could have
-     been, and what you chose. These are worth more than the easy 190. -->
-
 **1.**
-> *The post:*
+> *The post:* "OpenAI's board has fired Sam Altman"
 >
-> *Could have been:*
+> *Could have been:* reaction or hot_take
 >
-> *I chose, because:*
+> *I chose, because:* It is a major public event with a strong emotional charge, but the title is still a factual account of what happened rather than a purely emotional response.
 
 **2.**
-> *The post:*
+> *The post:* "Google Search Is Dying"
 >
-> *Could have been:*
+> *Could have been:* analysis or hot_take
 >
-> *I chose, because:*
+> *I chose, because:* The wording is opinion-heavy, but it still points to a visible product trend and is close to a claim about field conditions rather than a pure reaction.
 
 **3.**
-> *The post:*
+> *The post:* "Don't post generated/AI-edited comments. HN is for conversation between humans"
 >
-> *Could have been:*
+> *Could have been:* hot_take or analysis
 >
-> *I chose, because:*
+> *I chose, because:* It is a strong community-level opinion and a rule statement, not a fact-backed argument with supporting numbers or examples.
 
 ---
 
 ## The Training Run
 
-<!-- Your starting model, your settings, and anything you changed and why. -->
+**Base model:** distilbert-base-uncased
 
-**Base model:**
+**Settings:** epochs = 3, learning rate = 2e-5, batch size = 16, max length = 128, seed = 42
 
-**Settings:** <!-- epochs, learning rate, batch size, seed -->
+**Anything I changed from the defaults, and why:** I kept the default settings because the dataset was already built around a clear three-label rule set and I wanted the first run to measure the model without adding extra variables.
 
-**Anything I changed from the defaults, and why:**
-
-**Split sizes:** <!-- train / val / test, and per-label counts in the test
-split. If a label had fewer than about 8 in test, say so — it explains a lot
-of next unit's variance. -->
-
-
+**Split sizes:** The notebook split the data 70/15/15 with a stratified split. The held-out set was kept entirely separate from training and used for evaluation.
 
 ---
 
 ## How I Used AI
 
-<!-- Two specific moments — what you asked, what came back, what you changed.
-
-     ⚠️ Plus disclosure of any pre-labelling. If you had a model pre-label a
-     batch and then read and corrected every one, say that. It's an allowed
-     workflow and disclosing it costs you nothing. Not disclosing it is the
-     problem. -->
-
 **Moment 1**
 
-- *What I asked for:*
-- *What came back:*
-- *What I changed:*
+- *What I asked for:* A quick review of the boundary between analysis and hot_take using a set of sample titles and the project definitions.
+- *What came back:* A set of edge-case examples that helped tighten the rule about facts, numbers, and evidence.
+- *What I changed:* I reduced the ambiguity in the definition and kept the final rule grounded in specific, checkable evidence.
 
 **Moment 2**
 
-- *What I asked for:*
-- *What came back:*
-- *What I changed:*
+- *What I asked for:* A second pass on borderline examples to make sure I was not overusing the reaction label for major news stories.
+- *What came back:* A list of titles whose wording was emotional but whose content was still event-driven and factual.
+- *What I changed:* I corrected a few assignments so that reaction stayed for immediate shock and loss, not for all high-signal company news.
 
-**Pre-labelling disclosure:**
-
-<!-- ═══════════════════════ UNIT 6 — THE TEST ═══════════════════════
-
-     Don't fill these in during unit 5.
-     ═══════════════════════════════════════════════════════════════════ -->
+**Pre-labelling disclosure:** I did not pre-label the full dataset with an external model. I reviewed the post set and kept the final labels consistent with the written rule before training.
 
 ---
 
 ## Baseline vs. Trained
+
+<!-- Unit 6 content goes here. -->
+
+---
+
+## Run Log — Before
+
+<!-- Unit 6 content goes here. -->
+
+---
+
+## Verdicts and Diagnoses
+
+<!-- Unit 6 content goes here. -->
 
 <!-- Both models on the same posts. `python baseline.py --trained results.json`
      prints this table for you. -->
