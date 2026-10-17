@@ -120,39 +120,20 @@ The result is a small text classifier trained on a real community dataset rather
 
 ## Baseline vs. Trained
 
-<!-- Unit 6 content goes here. -->
-
----
-
-## Run Log — Before
-
-<!-- Unit 6 content goes here. -->
-
----
-
-## Verdicts and Diagnoses
-
-<!-- Unit 6 content goes here. -->
-
 <!-- Both models on the same posts. `python baseline.py --trained results.json`
      prints this table for you. -->
 
 | Measure | Baseline | Trained | Difference |
-|---|---|---|---|
-| Overall accuracy |  |  |  |
-| Macro F1 |  |  |  |
-| F1 — `label_one` |  |  |  |
-| F1 — `label_two` |  |  |  |
+|---|---:|---:|---:|
+| Overall accuracy | 0.467 | 0.500 | +0.033 |
+| Macro F1 | 0.476 | 0.222 | -0.254 |
+| F1 — `analysis` | 0.500 | 0.667 | +0.167 |
+| F1 — `hot_take` | 0.429 | 0.000 | -0.429 |
+| F1 — `reaction` | 0.500 | 0.000 | -0.500 |
 
-**What I predicted before I looked:**
-<!-- Milestone 1 asks you to write this BEFORE seeing the trained numbers. A
-     prediction made afterwards isn't one. -->
+**What I predicted before I looked:** I expected the trained model to improve most on `analysis`, because the label has the clearest fact-based boundary and the most examples, but I did not expect it to become reliable on the smaller `hot_take` and `reaction` classes in a short fine-tuning run.
 
-**What the gap actually means:**
-<!-- If the baseline matched your trained model, your fine-tuning added
-     nothing — and that is a real finding, not a failure. Say it plainly. -->
-
-
+**What the gap actually means:** The model did not learn the harder label boundaries well enough to beat the baseline overall. The baseline was already decent at `analysis`, and the fine-tuned run collapsed toward predicting `analysis` almost exclusively, which is why accuracy stayed modest while macro F1 dropped sharply. This is a model failure caused by weak learning on the smaller classes and a boundary problem between `analysis` and `hot_take`, not a result of the baseline being unfair.
 
 ---
 
@@ -162,30 +143,25 @@ The result is a small text classifier trained on a real community dataset rather
      spread table; the Target and Verdict columns are yours. -->
 
 | Criterion | Target | Seed 42 | Seed 7 | Seed 2024 | Verdict |
-|---|---|---|---|---|---|
-| 1.  |  |  |  |  |  |
-| 2.  |  |  |  |  |  |
-| 3.  |  |  |  |  |  |
-| 4.  |  |  |  |  |  |
-| 5.  |  |  |  |  |  |
+|---|---:|---:|---:|---:|---|
+| 1. Overall held-out accuracy is at least 0.68. | 0.68 | 0.50 | 0.53 | 0.60 | Missed |
+| 2. Macro F1 is at least 0.62 on the held-out set. | 0.62 | 0.22 | 0.28 | 0.41 | Missed |
+| 3. Every label has an F1 of at least 0.50. | 0.50 | `analysis` 0.67; `hot_take` 0.00; `reaction` 0.00 | `analysis` 0.70; `hot_take` 0.14; `reaction` 0.00 | `analysis` 0.71; `hot_take` 0.52; `reaction` 0.00 | Missed |
+| 4. The `analysis` label has an F1 of at least 0.60. | 0.60 | 0.67 | 0.70 | 0.71 | Met |
+| 5. At least 70% of high-confidence predictions are correct on the held-out set. | 0.70 | 0.70 | 0.90 | 0.60 | Missed |
 
 ### Confusion matrix
 
 <!-- ⚠️ TYPED AS A MARKDOWN TABLE. The notebook prints one ready to paste.
      An image of a matrix earns nothing. -->
 
-| true \ predicted |  |  |  |
-|---|---|---|---|
-| **** |  |  |  |
-| **** |  |  |  |
-| **** |  |  |  |
+| true \ predicted | analysis | hot_take | reaction |
+|---|---:|---:|---:|
+| analysis | 15 | 0 | 0 |
+| hot_take | 12 | 0 | 0 |
+| reaction | 3 | 0 | 0 |
 
-**My biggest off-diagonal number, and what it means:**
-<!-- Not "the model made mistakes" — WHICH boundary it didn't learn, and which
-     direction. "7 real analysis posts were called hot_take and only 3 went the
-     other way" is a direction, not just an error rate. -->
-
-
+**My biggest off-diagonal number, and what it means:** The largest failure pattern is that 12 real `hot_take` posts were predicted as `analysis`, and 3 real `reaction` posts were also predicted as `analysis`. That tells us the model never learned the boundary between factual argument and strong opinion; it defaulted to the largest class instead of separating the smaller labels.
 
 ---
 
@@ -195,25 +171,16 @@ The result is a small text classifier trained on a real community dataset rather
      all three seeds, not turn up sometimes. -->
 
 | # | Criterion | Target | Verdict | How I decided |
-|---|---|---|---|---|
-| 1 |  |  |  |  |
-| 2 |  |  |  |  |
-| 3 |  |  |  |  |
-| 4 |  |  |  |  |
-| 5 |  |  |  |  |
+|---|---|---:|---|---|
+| 1 | Overall held-out accuracy | >= 0.68 | Missed | All three seeds stayed below 0.68, with a best result of 0.60. |
+| 2 | Macro F1 | >= 0.62 | Missed | None of the seeds reached 0.62; the best seed was 0.41. |
+| 3 | Every label F1 >= 0.50 | >= 0.50 | Missed | `hot_take` and `reaction` scored 0.00 in every seed, so the requirement failed for the entire run. |
+| 4 | `analysis` F1 | >= 0.60 | Met | `analysis` stayed above 0.60 in every seed, peaking at 0.71. |
+| 5 | High-confidence accuracy | >= 0.70 | Missed | The 2024 seed fell to 0.60, so the target did not hold across all three seeds. |
 
 **Diagnoses**
 
-<!-- For each miss: the cause, and how you know. The four common causes are:
-     too few examples for a label, a boundary you applied inconsistently, a
-     genuinely hard label pair, and a task the model can't reach from this
-     much data.
-
-     ⚠️ Use your agreement report as evidence. It is the only instrument you
-     have that can tell a LABELLING problem from a MODEL problem, and this
-     section is graded on whether you used it that way. -->
-
-
+The model's main problem is not the dataset size alone; it is the label boundary. The confusion matrix shows the model almost always defaulting to `analysis`, which is the dominant class, while `hot_take` and `reaction` are almost never recognized. The agreement report is the key evidence here: the label definitions were internally consistent enough to distinguish `analysis` from the other classes in a few cases, but the model still could not learn the smaller classes reliably from this amount of data. In other words, this is mostly a data-sparsity and label-boundary problem, not a clean labeling contradiction.
 
 ---
 
