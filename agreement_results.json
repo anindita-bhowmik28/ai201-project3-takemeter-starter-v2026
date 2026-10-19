@@ -1,0 +1,33 @@
+{
+  "compared": 30,
+  "agreed": 25,
+  "agreement_rate": 0.8333333333333334,
+  "disagreements": [
+    {
+      "text": "Three of us ran the same session on the same day, different shoes, within 10 seconds of each other over 5 miles. I'm not saying shoes do nothing, but whatever they do was smaller than the noise between three people.",
+      "staff": "hot_take",
+      "mine": "analysis"
+    },
+    {
+      "text": "Times are down about 3% since the shoe rules changed, so obviously the shoes are the whole story and the sport has a problem.",
+      "staff": "hot_take",
+      "mine": "analysis"
+    },
+    {
+      "text": "If you need a gel before 90 minutes you have a fuelling problem, not an energy problem.",
+      "staff": "hot_take",
+      "mine": "analysis"
+    },
+    {
+      "text": "Watching the last 400 of that and I had to stand up. Still standing up actually.",
+      "staff": "reaction",
+      "mine": "hot_take"
+    },
+    {
+      "text": "Just realised the shoes I set every PB in this year are the ones I bought by accident in the wrong size.",
+      "staff": "reaction",
+      "mine": "hot_take"
+    }
+  ],
+  "staff_posts_not_in_mine": 0
+}

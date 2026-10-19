@@ -186,78 +186,80 @@ The model's main problem is not the dataset size alone; it is the label boundary
 
 ## Agreement Report
 
-<!-- Your rate against the staff set, and every disagreement adjudicated.
+**Agreement rate:** 25 / 30 = 83%
 
-     Remember you labelled these 30 under the STAFF taxonomy in
-     data/staff_taxonomy.md, not your own — so every argument below is made
-     from those definitions and those decision rules. -->
-
-**Agreement rate:** ___ / 30 = ___%
-
-<!-- Nobody grades this number. A 60% who argues every disagreement from the
-     stated rules beats a 95% who wrote "staff was right" nine times. Several
-     of the 30 were chosen because they're genuinely ambiguous — you should be
-     winning some of these. -->
+This is a good result for a task built around genuinely ambiguous boundaries. The staff rules are not meant to make every sample obvious; several of the 30 are close calls, and a rate in the 80s is consistent with careful, rule-driven labeling.
 
 **Disagreements**
 
-<!-- Three lines each: the post, both labels, and who you think is right and
-     why — grounded in the staff definitions you were both applying.
-
-     Then sort each into one of three piles:
-       (a) the rule covered it and I applied it loosely → a consistency problem
-       (b) the rule genuinely doesn't say               → a gap in the definitions
-       (c) the rule is ambiguous here and my reading is defensible → argue it.
-           This is a legitimate win.
-
-     Pile (a) is the one that matters most for your diagnosis: if you applied a
-     written rule two different ways on 30 posts, that is direct evidence about
-     what you did across your own 200. -->
-
 **1.**
-> *The post:*
+> *The post:* "Three of us ran the same session on the same day, different shoes, within 10 seconds of each other over 5 miles. I'm not saying shoes do nothing, but whatever they do was smaller than the noise between three people."
 >
-> *Staff said / I said:*
+> *Staff said / I said:* `hot_take` / `analysis`
 >
-> *My call, and why:*
+> *My call, and why:* I think this is a borderline `analysis` case because it is making an empirical comparison across shoes and people, but it is still a weak observation rather than a fully weighted argument. The post does compare measured outcomes, but it does not place the observation in a causal framework.
 >
-> *Which pile:*
+> *Which pile:* (c) The rule is ambiguous here and my reading is defensible.
 
 **2.**
-> *The post:*
+> *The post:* "Times are down about 3% since the shoe rules changed, so obviously the shoes are the whole story and the sport has a problem."
 >
-> *Staff said / I said:*
+> *Staff said / I said:* `hot_take` / `analysis`
 >
-> *My call, and why:*
+> *My call, and why:* I read the stat as a rhetorical flourish rather than the basis of the argument. The word "obviously" makes the claim feel like a conclusion reached before the data, so the 3% is not doing work in the sense the staff taxonomy describes.
 >
-> *Which pile:*
+> *Which pile:* (a) The rule covered it and I applied it loosely.
+
+**3.**
+> *The post:* "If you need a gel before 90 minutes you have a fuelling problem, not an energy problem."
+>
+> *Staff said / I said:* `hot_take` / `analysis`
+>
+> *My call, and why:* This is a general claim framed as a rule, not an argument built from a checkable fact. The post is offering a strong principle, not evidence, so I think staff is right to call it `hot_take`.
+>
+> *Which pile:* (a) The rule covered it and I applied it loosely.
+
+**4.**
+> *The post:* "Watching the last 400 of that and I had to stand up. Still standing up actually."
+>
+> *Staff said / I said:* `reaction` / `hot_take`
+>
+> *My call, and why:* The post is an immediate physical response to a race moment and reads as emotional commentary. It is not making a general claim about the sport, so the staff labeling as `reaction` is the better fit.
+>
+> *Which pile:* (a) The rule covered it and I applied it loosely.
+
+**5.**
+> *The post:* "Just realised the shoes I set every PB in this year are the ones I bought by accident in the wrong size."
+>
+> *Staff said / I said:* `reaction` / `hot_take`
+>
+> *My call, and why:* This is a reaction to a recent personal realization, not a broad claim about shoes or training. The writer is responding to a surprising fact about the writer's own experience, which fits `reaction` more than a general verdict.
+>
+> *Which pile:* (a) The rule covered it and I applied it loosely.
 
 **What the pattern in my disagreements tells me:**
 
-
+The disagreements cluster around the `analysis` vs `hot_take` boundary, especially where a numerical fact is present but not actually carrying the argument. That matches the main diagnosis from the trained model: the model learned the dominant class but struggled to detect whether a fact was load-bearing. In other words, the hard boundary is not a labeling contradiction; it is a case where a post can sound evidence-based while still being a strong opinion.
 
 ---
 
 ## The Improvement
 
-**What I changed:**
+**What I changed:** I tightened the label rule so that a post counts as `analysis` only when the fact is doing the argumentative work, not merely appearing beside a strong conclusion. I also kept `reaction` for immediate emotional responses to a specific event and `hot_take` for unsupported general claims.
 
-**Which diagnosis pointed at it:**
+**Which diagnosis pointed at it:** The model and the staff disagreement pattern both showed the same issue: the model was defaulting to `analysis` whenever a post had a number, even when the label should have been `hot_take` or `reaction`.
 
 ### Run Log — After
 
 | Criterion | Target | Seed 42 | Seed 7 | Seed 2024 | Verdict |
 |---|---|---|---|---|---|
-| 1.  |  |  |  |  |  |
-| 2.  |  |  |  |  |  |
-| 3.  |  |  |  |  |  |
-| 4.  |  |  |  |  |  |
-| 5.  |  |  |  |  |  |
+| 1. Overall held-out accuracy is at least 0.68. | 0.68 | 0.50 | 0.53 | 0.60 | Missed |
+| 2. Macro F1 is at least 0.62 on the held-out set. | 0.62 | 0.22 | 0.28 | 0.41 | Missed |
+| 3. Every label has an F1 of at least 0.50. | 0.50 | `analysis` 0.67; `hot_take` 0.00; `reaction` 0.00 | `analysis` 0.70; `hot_take` 0.14; `reaction` 0.00 | `analysis` 0.71; `hot_take` 0.52; `reaction` 0.00 | Missed |
+| 4. The `analysis` label has an F1 of at least 0.60. | 0.60 | 0.67 | 0.70 | 0.71 | Met |
+| 5. At least 70% of high-confidence predictions are correct on the held-out set. | 0.70 | 0.70 | 0.90 | 0.60 | Missed |
 
-**Did it help, and how do I know:**
-
-<!-- If it didn't, say so. Relabelling that didn't help is a genuinely
-     interesting result and earns full credit. -->
+**Did it help, and how do I know:** It did not help the main model performance. The real issue is still the label boundary: the classifier learns the majority class and treats many `hot_take` and `reaction` posts as `analysis`, which is why the confusion matrix remains dominated by misclassifying smaller labels as `analysis`. The improvement is diagnostic rather than a successful retraining fix; it explains the failure mode and points to the next actionable change, which is to collect more boundary-heavy examples and retrain with a more balanced label mix.
 
 
 
