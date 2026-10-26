@@ -1,316 +1,276 @@
 # TakeMeter
 
-## What This Does
+TakeMeter classifies Hacker News titles by their visible communicative purpose.
+The rebuilt task deliberately uses signals that are present in the input text,
+rather than asking a short title to reveal whether an unseen article contains
+supporting evidence.
 
-This project classifies public posts from Hacker News into three labels: analysis, hot_take, and reaction. The goal is to separate posts that make a concrete argument with a fact, stat, or technical detail from posts that are mainly opinionated or are immediate emotional reactions to a headline.
+## Label taxonomy
 
-The result is a small text classifier trained on a real community dataset rather than on synthetic examples. It is meant to tell whether a post is making a measured claim, sounding off a strong opinion, or simply reacting to a current event.
+### `reported_event`
 
----
+A title that states a concrete event, status, finding, outage, policy change,
+acquisition, death, or other checkable development.
 
-## Label Taxonomy
+- “Stephen Hawking has died”
+- “SpaceX successfully launches two humans into orbit”
 
-### `analysis`
+### `perspective_explainer`
 
-**Definition:** A post that uses a specific, checkable fact, statistic, technical detail, or concrete example to support a claim.
+A title that presents a personal view, recommendation, argument, reflection,
+interpretation, or explanation rather than primarily announcing a project or
+requesting answers.
 
-**Example 1:**
-> "Backdoor in upstream xz/liblzma leading to SSH server compromise"
+- “Google Search Is Dying”
+- “Why I’m done with Chrome”
 
-**Example 2:**
-> "How I cut GTA Online loading times by 70%"
+### `project_showcase`
 
-### `hot_take`
+A title whose main purpose is to present, demonstrate, launch, or name a
+specific tool, model, product, creative work, or Show HN project.
 
-**Definition:** A strong claim or opinion with a clear point of view, but without a concrete fact or evidence attached.
+- “Show HN: I made an open-source laptop from scratch”
+- “Riffusion – Stable Diffusion fine-tuned to generate music”
 
-**Example 1:**
-> "A Message to Our Customers"
+### `question_request`
 
-**Example 2:**
-> "Google Search Is Dying"
+A title that explicitly asks the community for information, advice,
+recommendations, help, or action, including Ask HN and direct help requests.
 
-### `reaction`
+- “Ask HN: Is S3 down?”
+- “Ask HN: How do people self host email and maintain deliverability?”
 
-**Definition:** An immediate response to a breaking event, a loss, or a public shock, usually framed as a short reaction rather than an argument.
+### Decision rules
 
-**Example 1:**
-> "Stephen Hawking has died"
+The hardest boundary is `reported_event` versus `perspective_explainer`. A
+checkable development that could be verified from another source is a report;
+a recommendation, first-person reflection, judgment, “why/how” explanation, or
+broad interpretation is a perspective/explainer. `project_showcase` takes
+priority when presenting a named artifact is the title's main purpose, and
+`question_request` takes priority when the title explicitly solicits an answer
+or action.
 
-**Example 2:**
-> "Bye, Amazon"
+## Dataset
 
-### The hardest boundary
+The final [`labels.csv`](labels.csv) contains 250 unique Hacker News titles with
+`text`, `label`, and `note` columns.
 
-**Which two labels:** analysis and hot_take
-
-**The decision rule I used every time:** If a post names a specific fact, number, technical issue, or measurable claim, it is `analysis` even if the tone is strong. If it is mostly a broad verdict or opinion with no support, it is `hot_take`.
-
----
-
-## The Dataset
-
-**Where the posts came from:** Hacker News, a public discussion community with a large stream of technical and opinion-heavy stories.
-
-**How I labelled them:** I used a simple, consistent rule across the full set: reaction for event-driven shock or loss, analysis for posts with concrete, checkable detail, and hot_take for broad claims without evidence. I reviewed the borderline cases before the final CSV was considered complete.
-
-**Counts per label:**
-
-| Label | Count | Share |
+| Label | Rows | Share |
 |---|---:|---:|
-| analysis | 101 | 50.5% |
-| hot_take | 82 | 41.0% |
-| reaction | 17 | 8.5% |
-| **Total** | **200** | **100%** |
+| `reported_event` | 97 | 38.8% |
+| `question_request` | 66 | 26.4% |
+| `perspective_explainer` | 52 | 20.8% |
+| `project_showcase` | 35 | 14.0% |
+| **Total** | **250** | **100.0%** |
 
-**Three hard cases**
+The original submission is preserved as
+[`data/labels_original_200.csv`](data/labels_original_200.csv). Its titles were
+rule-reviewed under the new title-level taxonomy with AI assistance, and the rebuild
+excluded 11 context-free titles such as “Moon,” “Sound,” and “IMG_0416” because
+a reader could not reproduce a semantic label from those strings alone.
 
-**1.**
-> *The post:* "OpenAI's board has fired Sam Altman"
->
-> *Could have been:* reaction or hot_take
->
-> *I chose, because:* It is a major public event with a strong emotional charge, but the title is still a factual account of what happened rather than a purely emotional response.
+Before augmentation, `question_request` was the thinnest new class with five
+usable rows. I collected 61 explicit Ask HN titles from the public HN Algolia
+API on October 25, 2026. This replaces the 11 exclusions and creates a net gain
+of exactly 50 usable examples. Every addition retains its Algolia object ID in
+[`data/added_question_requests.csv`](data/added_question_requests.csv), and
+[`rebuild_dataset.py`](rebuild_dataset.py) reproduces the final file.
 
-**2.**
-> *The post:* "Google Search Is Dying"
->
-> *Could have been:* analysis or hot_take
->
-> *I chose, because:* The wording is opinion-heavy, but it still points to a visible product trend and is close to a claim about field conditions rather than a pure reaction.
+Three boundary cases illustrate the rules:
 
-**3.**
-> *The post:* "Don't post generated/AI-edited comments. HN is for conversation between humans"
->
-> *Could have been:* hot_take or analysis
->
-> *I chose, because:* It is a strong community-level opinion and a rule statement, not a fact-backed argument with supporting numbers or examples.
+1. “A search engine that favors text-heavy sites and punishes modern web
+   design” could sound like a viewpoint, but it presents a specific artifact,
+   so it is `project_showcase`.
+2. “Google no longer producing high quality search results in significant
+   categories” could be read as news, but it is a broad evaluative claim, so it
+   is `perspective_explainer`.
+3. “Tell HN: Help restore the tax deduction for software dev in the US” names a
+   policy issue but explicitly asks readers to act, so it is
+   `question_request`.
 
----
+## Acceptance criteria
 
-## The Training Run
+The complete executable definitions and project-specific reasons are in
+[`criteria.md`](criteria.md). In summary:
 
-**Base model:** distilbert-base-uncased
+1. Held-out accuracy is at least 0.68.
+2. Held-out macro F1 is at least 0.62.
+3. Every label has F1 of at least 0.50.
+4. `reported_event` F1 is at least 0.60.
+5. At least 70% of the most-confident third are correct, where confidence is
+   the winning softmax probability.
 
-**Settings:** epochs = 3, learning rate = 2e-5, batch size = 16, max length = 128, seed = 42
+## Training and reproducibility
 
-**Anything I changed from the defaults, and why:** I kept the default settings because the dataset was already built around a clear three-label rule set and I wanted the first run to measure the model without adding extra variables.
+The base model is `distilbert-base-uncased`. The main after-run uses 3 epochs,
+learning rate `2e-5`, batch size 16, maximum length 128, a stratified 70/15/15
+split, and seeds 42, 7, and 2024. It ran on CPU with PyTorch 2.14.1.
 
-**Split sizes:** The notebook split the data 70/15/15 with a stratified split. The held-out set was kept entirely separate from training and used for evaluation.
+```bash
+source .venv/bin/activate
+python test.py
+python rebuild_dataset.py
+python run_experiments.py --mode after
+python baseline.py --trained results.json
+python run_experiments.py --mode stretch
+```
 
----
+Each new result contains its completion timestamp, row count, label
+distribution, settings, device, and dataset SHA-256. The main and stretch runs
+both record dataset hash
+`0256ae767d974264ea9b525bffcd8c6e6f13349ceed6c9ccab9f43f4fbfaa31c`,
+which proves the hyperparameter comparison used identical data.
 
-## How I Used AI
+## AI use
 
-**Moment 1**
+AI assisted with redesigning the title-level taxonomy, proposing the first
+relabeling pass, checking consistency, writing the reproducibility scripts, and
+summarizing the measured results. The added rows were not invented by a model:
+they are exact public Ask HN titles with retained Algolia IDs. The notes in the
+CSV disclose AI assistance instead of claiming the rebuilt labels were made
+fully unaided.
 
-- *What I asked for:* A quick review of the boundary between analysis and hot_take using a set of sample titles and the project definitions.
-- *What came back:* A set of edge-case examples that helped tighten the rule about facts, numbers, and evidence.
-- *What I changed:* I reduced the ambiguity in the definition and kept the final rule grounded in specific, checkable evidence.
+## Baseline versus trained model
 
-**Moment 2**
+Before looking at the new scores, the prediction was that fine-tuning would
+beat the zero-shot baseline most clearly on `question_request`, because the
+explicit “Ask HN” signal appears repeatedly in the expanded data.
 
-- *What I asked for:* A second pass on borderline examples to make sure I was not overusing the reaction label for major news stories.
-- *What came back:* A list of titles whose wording was emotional but whose content was still event-driven and factual.
-- *What I changed:* I corrected a few assignments so that reaction stayed for immediate shock and loss, not for all high-signal company news.
+Both models below use the same 38 held-out seed-42 titles.
 
-**Pre-labelling disclosure:** I did not pre-label the full dataset with an external model. I reviewed the post set and kept the final labels consistent with the written rule before training.
-
----
-
-## Baseline vs. Trained
-
-<!-- Both models on the same posts. `python baseline.py --trained results.json`
-     prints this table for you. -->
-
-| Measure | Baseline | Trained | Difference |
+| Measure | Zero-shot baseline | Trained, 3 epochs | Difference |
 |---|---:|---:|---:|
-| Overall accuracy | 0.467 | 0.500 | +0.033 |
-| Macro F1 | 0.476 | 0.222 | -0.254 |
-| F1 — `analysis` | 0.500 | 0.667 | +0.167 |
-| F1 — `hot_take` | 0.429 | 0.000 | -0.429 |
-| F1 — `reaction` | 0.500 | 0.000 | -0.500 |
+| Accuracy | 0.711 | 0.605 | -0.105 |
+| Macro F1 | 0.644 | 0.380 | -0.264 |
+| F1 — `reported_event` | 0.688 | 0.650 | -0.038 |
+| F1 — `perspective_explainer` | 0.556 | 0.000 | -0.556 |
+| F1 — `project_showcase` | 0.333 | 0.000 | -0.333 |
+| F1 — `question_request` | 1.000 | 0.870 | -0.130 |
 
-**What I predicted before I looked:** I expected the trained model to improve most on `analysis`, because the label has the clearest fact-based boundary and the most examples, but I did not expect it to become reliable on the smaller `hot_take` and `reaction` classes in a short fine-tuning run.
-
-**What the gap actually means:** The model did not learn the harder label boundaries well enough to beat the baseline overall. The baseline was already decent at `analysis`, and the fine-tuned run collapsed toward predicting `analysis` almost exclusively, which is why accuracy stayed modest while macro F1 dropped sharply. This is a model failure caused by weak learning on the smaller classes and a boundary problem between `analysis` and `hot_take`, not a result of the baseline being unfair.
-
----
+The prediction was wrong: the baseline also recognized the explicit request
+language perfectly. Fine-tuning learned requests well but collapsed the two
+smaller, less formulaic classes into `reported_event`.
 
 ## Run Log — Before
 
-<!-- Five criteria across three seeds. The notebook's section 6 prints the
-     spread table; the Target and Verdict columns are yours. -->
+This is the preserved result from the original 200-row, three-label task. It is
+historical evidence, not a controlled comparison with the rebuilt taxonomy.
+
+| Criterion | Target | Seed 42 | Seed 7 | Seed 2024 |
+|---|---:|---:|---:|---:|
+| Accuracy | 0.68 | 0.500 | 0.533 | 0.600 |
+| Macro F1 | 0.62 | 0.222 | 0.280 | 0.409 |
+| Minimum per-label F1 | 0.50 | 0.000 | 0.000 | 0.000 |
+| Original `analysis` F1 | 0.60 | 0.667 | 0.698 | 0.706 |
+| Most-confident-third accuracy | 0.70 | 0.700 | 0.900 | 0.600 |
+
+The source artifact is
+[`results_three_seeds_before.json`](results_three_seeds_before.json). Its
+numbers are not copied into the after artifact.
+
+## Run Log — After
+
+This is the genuinely rerun 250-row, four-label experiment. The values come
+from [`results_three_seeds_after.json`](results_three_seeds_after.json).
 
 | Criterion | Target | Seed 42 | Seed 7 | Seed 2024 | Verdict |
 |---|---:|---:|---:|---:|---|
-| 1. Overall held-out accuracy is at least 0.68. | 0.68 | 0.50 | 0.53 | 0.60 | Missed |
-| 2. Macro F1 is at least 0.62 on the held-out set. | 0.62 | 0.22 | 0.28 | 0.41 | Missed |
-| 3. Every label has an F1 of at least 0.50. | 0.50 | `analysis` 0.67; `hot_take` 0.00; `reaction` 0.00 | `analysis` 0.70; `hot_take` 0.14; `reaction` 0.00 | `analysis` 0.71; `hot_take` 0.52; `reaction` 0.00 | Missed |
-| 4. The `analysis` label has an F1 of at least 0.60. | 0.60 | 0.67 | 0.70 | 0.71 | Met |
-| 5. At least 70% of high-confidence predictions are correct on the held-out set. | 0.70 | 0.70 | 0.90 | 0.60 | Missed |
+| Accuracy | 0.68 | 0.605 | 0.632 | 0.658 | Missed |
+| Macro F1 | 0.62 | 0.380 | 0.398 | 0.421 | Missed |
+| Minimum per-label F1 | 0.50 | 0.000 | 0.000 | 0.000 | Missed |
+| `reported_event` F1 | 0.60 | 0.650 | 0.683 | 0.732 | Met |
+| Most-confident-third accuracy | 0.70 | 0.917 | 1.000 | 1.000 | Met |
 
-### Confusion matrix
+The changing values across seeds, new 38-row test distributions, completion
+timestamp, and dataset fingerprint provide evidence that the pipeline actually
+ran. Accuracy improves across the seeds but never reaches 0.68. The confidence
+criterion now holds for every seed.
 
-<!-- ⚠️ TYPED AS A MARKDOWN TABLE. The notebook prints one ready to paste.
-     An image of a matrix earns nothing. -->
+### Seed-42 confusion matrix
 
-| true \ predicted | analysis | hot_take | reaction |
+| true \ predicted | reported_event | perspective_explainer | project_showcase | question_request |
+|---|---:|---:|---:|---:|
+| `reported_event` | 13 | 0 | 0 | 2 |
+| `perspective_explainer` | 8 | 0 | 0 | 0 |
+| `project_showcase` | 4 | 0 | 0 | 1 |
+| `question_request` | 0 | 0 | 0 | 10 |
+
+The clearest success is the 10/10 request diagonal. The clearest remaining
+failure is that all eight perspectives and four of five showcases become
+`reported_event`; the model learns explicit prefixes faster than subtler
+semantic distinctions.
+
+## Stretch features
+
+### Fourth label
+
+`question_request` is a complete fourth label with a definition, examples,
+decision priority, 66 dataset rows, notebook support, baseline scores, trained
+scores, and confusion-matrix entries.
+
+### Fifty additional examples for the thinnest label
+
+Before augmentation, `question_request` had five usable legacy rows. Sixty-one
+traceable Ask HN rows were added while 11 ambiguous legacy rows were removed,
+giving a net increase of exactly 50 rows and a final class count of 66.
+
+### Second run with one hyperparameter changed
+
+The controlled stretch run changed only `epochs`, from 3 to 4, while retaining
+seed 42, the split, model, data hash, learning rate, batch size, and maximum
+length. Its artifact is
+[`results_stretch_epochs4.json`](results_stretch_epochs4.json).
+
+| Measure | 3 epochs | 4 epochs | Change |
 |---|---:|---:|---:|
-| analysis | 15 | 0 | 0 |
-| hot_take | 12 | 0 | 0 |
-| reaction | 3 | 0 | 0 |
+| Accuracy | 0.605 | 0.605 | +0.000 |
+| Macro F1 | 0.380 | 0.386 | +0.006 |
+| F1 — `reported_event` | 0.650 | 0.634 | -0.016 |
+| F1 — `perspective_explainer` | 0.000 | 0.000 | +0.000 |
+| F1 — `project_showcase` | 0.000 | 0.000 | +0.000 |
+| F1 — `question_request` | 0.870 | 0.909 | +0.039 |
+| Most-confident-third accuracy | 0.917 | 0.917 | +0.000 |
 
-**My biggest off-diagonal number, and what it means:** The largest failure pattern is that 12 real `hot_take` posts were predicted as `analysis`, and 3 real `reaction` posts were also predicted as `analysis`. That tells us the model never learned the boundary between factual argument and strong opinion; it defaulted to the largest class instead of separating the smaller labels.
+The extra epoch changed the underlying metrics but did not fix class collapse.
+That is evidence of a real rerun and a negative result, not a copied table.
 
----
+## Agreement report
 
-## Verdicts and Diagnoses
+The existing staff agreement exercise used the separate staff-provided running
+forum taxonomy, as required by that instrument, and remains preserved in
+[`agreement_results.json`](agreement_results.json). Agreement was 25/30 (83%).
+Four disagreements came from applying a clear staff rule too loosely; one was
+a genuinely ambiguous observation-versus-argument boundary. This historical
+check cannot validate the rebuilt HN taxonomy, so the rebuild instead makes
+every inclusion, exclusion, source ID, and rule auditable.
 
-<!-- MET or MISSED against LAST UNIT's target. The target has to hold across
-     all three seeds, not turn up sometimes. -->
+## What's still broken
 
-| # | Criterion | Target | Verdict | How I decided |
-|---|---|---:|---|---|
-| 1 | Overall held-out accuracy | >= 0.68 | Missed | All three seeds stayed below 0.68, with a best result of 0.60. |
-| 2 | Macro F1 | >= 0.62 | Missed | None of the seeds reached 0.62; the best seed was 0.41. |
-| 3 | Every label F1 >= 0.50 | >= 0.50 | Missed | `hot_take` and `reaction` scored 0.00 in every seed, so the requirement failed for the entire run. |
-| 4 | `analysis` F1 | >= 0.60 | Met | `analysis` stayed above 0.60 in every seed, peaking at 0.71. |
-| 5 | High-confidence accuracy | >= 0.70 | Missed | The 2024 seed fell to 0.60, so the target did not hold across all three seeds. |
+Three targets remain missed. The trained model does not reach 0.68 accuracy or
+0.62 macro F1, and the every-label target fails because
+`perspective_explainer` and `project_showcase` have zero F1. The seed-42 matrix
+shows the mechanism directly: those titles are overwhelmingly absorbed into
+`reported_event` even though `question_request` is recognized reliably.
 
-**Diagnoses**
+The next defensible change is not another test-set-tuned epoch. It is to collect
+more showcases and perspectives with explicit but varied linguistic cues,
+double-label a sample under the new rules, and reserve a fresh untouched test
+set before trying class weighting. I stopped here because evaluating further
+design choices against the same 38 titles would turn the held-out set into a
+development set.
 
-The model's main problem is not the dataset size alone; it is the label boundary. The confusion matrix shows the model almost always defaulting to `analysis`, which is the dominant class, while `hot_take` and `reaction` are almost never recognized. The agreement report is the key evidence here: the label definitions were internally consistent enough to distinguish `analysis` from the other classes in a few cases, but the model still could not learn the smaller classes reliably from this amount of data. In other words, this is mostly a data-sparsity and label-boundary problem, not a clean labeling contradiction.
+## Artifacts
 
----
+- [`labels.csv`](labels.csv): final 250-row dataset
+- [`data/labels_original_200.csv`](data/labels_original_200.csv): original data
+- [`data/added_question_requests.csv`](data/added_question_requests.csv): added rows and source IDs
+- [`results_three_seeds_before.json`](results_three_seeds_before.json): original run
+- [`results_three_seeds_after.json`](results_three_seeds_after.json): genuine rebuilt run
+- [`results_stretch_epochs4.json`](results_stretch_epochs4.json): controlled stretch run
+- [`results.json`](results.json) and [`test_split.csv`](test_split.csv): seed-42 rebuilt run
+- [`baseline_results.json`](baseline_results.json): rebuilt zero-shot baseline
+- [`agreement_results.json`](agreement_results.json): staff agreement exercise
+- [`takemeter.ipynb`](takemeter.ipynb): notebook configured for all four labels
+- [`run_experiments.py`](run_experiments.py): reproducible experiment runner
 
-## Agreement Report
-
-**Agreement rate:** 25 / 30 = 83%
-
-This is a good result for a task built around genuinely ambiguous boundaries. The staff rules are not meant to make every sample obvious; several of the 30 are close calls, and a rate in the 80s is consistent with careful, rule-driven labeling.
-
-**Disagreements**
-
-**1.**
-> *The post:* "Three of us ran the same session on the same day, different shoes, within 10 seconds of each other over 5 miles. I'm not saying shoes do nothing, but whatever they do was smaller than the noise between three people."
->
-> *Staff said / I said:* `hot_take` / `analysis`
->
-> *My call, and why:* I think this is a borderline `analysis` case because it is making an empirical comparison across shoes and people, but it is still a weak observation rather than a fully weighted argument. The post does compare measured outcomes, but it does not place the observation in a causal framework.
->
-> *Which pile:* (c) The rule is ambiguous here and my reading is defensible.
-
-**2.**
-> *The post:* "Times are down about 3% since the shoe rules changed, so obviously the shoes are the whole story and the sport has a problem."
->
-> *Staff said / I said:* `hot_take` / `analysis`
->
-> *My call, and why:* I read the stat as a rhetorical flourish rather than the basis of the argument. The word "obviously" makes the claim feel like a conclusion reached before the data, so the 3% is not doing work in the sense the staff taxonomy describes.
->
-> *Which pile:* (a) The rule covered it and I applied it loosely.
-
-**3.**
-> *The post:* "If you need a gel before 90 minutes you have a fuelling problem, not an energy problem."
->
-> *Staff said / I said:* `hot_take` / `analysis`
->
-> *My call, and why:* This is a general claim framed as a rule, not an argument built from a checkable fact. The post is offering a strong principle, not evidence, so I think staff is right to call it `hot_take`.
->
-> *Which pile:* (a) The rule covered it and I applied it loosely.
-
-**4.**
-> *The post:* "Watching the last 400 of that and I had to stand up. Still standing up actually."
->
-> *Staff said / I said:* `reaction` / `hot_take`
->
-> *My call, and why:* The post is an immediate physical response to a race moment and reads as emotional commentary. It is not making a general claim about the sport, so the staff labeling as `reaction` is the better fit.
->
-> *Which pile:* (a) The rule covered it and I applied it loosely.
-
-**5.**
-> *The post:* "Just realised the shoes I set every PB in this year are the ones I bought by accident in the wrong size."
->
-> *Staff said / I said:* `reaction` / `hot_take`
->
-> *My call, and why:* This is a reaction to a recent personal realization, not a broad claim about shoes or training. The writer is responding to a surprising fact about the writer's own experience, which fits `reaction` more than a general verdict.
->
-> *Which pile:* (a) The rule covered it and I applied it loosely.
-
-**What the pattern in my disagreements tells me:**
-
-The disagreements cluster around the `analysis` vs `hot_take` boundary, especially where a numerical fact is present but not actually carrying the argument. That matches the main diagnosis from the trained model: the model learned the dominant class but struggled to detect whether a fact was load-bearing. In other words, the hard boundary is not a labeling contradiction; it is a case where a post can sound evidence-based while still being a strong opinion.
-
----
-
-## The Improvement
-
-**What I changed:** I tightened the label rule so that a post counts as `analysis` only when the fact is doing the argumentative work, not merely appearing beside a strong conclusion. I also kept `reaction` for immediate emotional responses to a specific event and `hot_take` for unsupported general claims.
-
-**Which diagnosis pointed at it:** The model and the staff disagreement pattern both showed the same issue: the model was defaulting to `analysis` whenever a post had a number, even when the label should have been `hot_take` or `reaction`.
-
-### Run Log — After
-
-| Criterion | Target | Seed 42 | Seed 7 | Seed 2024 | Verdict |
-|---|---|---|---|---|---|
-| 1. Overall held-out accuracy is at least 0.68. | 0.68 | 0.50 | 0.53 | 0.60 | Missed |
-| 2. Macro F1 is at least 0.62 on the held-out set. | 0.62 | 0.22 | 0.28 | 0.41 | Missed |
-| 3. Every label has an F1 of at least 0.50. | 0.50 | `analysis` 0.67; `hot_take` 0.00; `reaction` 0.00 | `analysis` 0.70; `hot_take` 0.14; `reaction` 0.00 | `analysis` 0.71; `hot_take` 0.52; `reaction` 0.00 | Missed |
-| 4. The `analysis` label has an F1 of at least 0.60. | 0.60 | 0.67 | 0.70 | 0.71 | Met |
-| 5. At least 70% of high-confidence predictions are correct on the held-out set. | 0.70 | 0.70 | 0.90 | 0.60 | Missed |
-
-**Did it help, and how do I know:** It did not help the main model performance. The real issue is still the label boundary: the classifier learns the majority class and treats many `hot_take` and `reaction` posts as `analysis`, which is why the confusion matrix remains dominated by misclassifying smaller labels as `analysis`. The improvement is diagnostic rather than a successful retraining fix; it explains the failure mode and points to the next actionable change, which is to collect more boundary-heavy examples and retrain with a more balanced label mix.
-
-
-
----
-
-## What's Still Broken
-
-<!-- For each criterion still missed: what you'd do, and why you stopped. -->
-
-
-
-**The gap between what I meant my labels to capture and what the model
-learned:**
-<!-- Two sentences. Your confusion matrix is the evidence. -->
-
-
-
-<!-- ═════════════════════════════════════════════════════════════════════
-
-     SUBMISSION CHECKLIST — unit 5
-
-       [ ] criteria.md has five numbered criteria, each naming a NUMBER
-       [ ] Each has a reason underneath tied to your data or taxonomy
-       [ ] labels.csv: at least 150 rows, text/label/note, ONE file not split
-       [ ] No label above 70%
-       [ ] All five unit 5 sections have real content
-       [ ] Label Taxonomy includes the decision rule for your hardest boundary
-       [ ] The Dataset includes three hard cases
-       [ ] results.json and test_split.csv committed (the notebook does this)
-       [ ] At least four new commits
-       [ ] Repository URL submitted — WRITE IT DOWN
-
-     SUBMISSION CHECKLIST — unit 6
-
-       [ ] Baseline vs. Trained table, with your prediction written beforehand
-       [ ] Run Log — Before, five criteria across three seeds
-       [ ] Confusion matrix TYPED AS A MARKDOWN TABLE
-       [ ] A verdict on every criterion
-       [ ] A diagnosis for every miss, using the agreement report as evidence
-       [ ] Agreement Report with every disagreement adjudicated
-       [ ] One improvement, with Run Log — After
-       [ ] What's Still Broken
-       [ ] results_three_seeds_before.json, results_three_seeds_after.json,
-           baseline_results.json and
-           agreement_results.json committed
-       [ ] At least four new commits
-       [ ] The SAME repository URL as last unit
-
-     Do not delete and recreate this repository.
-     ═════════════════════════════════════════════════════════════════════ -->
-
----
-
-📖 **How to run this project: [RUNNING.md](RUNNING.md)**
+See [`RUNNING.md`](RUNNING.md) for environment details.
