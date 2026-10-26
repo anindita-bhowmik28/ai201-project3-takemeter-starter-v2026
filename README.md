@@ -1,24 +1,7 @@
 # TakeMeter
 
-TakeMeter classifies Hacker News titles by their visible communicative purpose.
-The rebuilt task deliberately uses signals that are present in the input text,
-rather than asking a short title to reveal whether an unseen article contains
-supporting evidence.
-
-## Part 2 plan — declared before experiments
-
-The required improvement will add examples to `project_showcase` if the frozen
-before-run confirms that it is the thinnest and worst-performing label. The
-three stretch items planned before implementation are:
-
-1. compare accuracy in the most-confident and least-confident thirds;
-2. write a per-label error analysis for the label with the worst matrix row;
-3. measure a second improvement by changing only epochs from 3 to 4 and running
-   the same three seeds in the same five-criterion format.
-
-This declaration fixes the scope in advance: the required change is a data
-change, while the optional second change is reported separately and cannot be
-used to reinterpret the required before/after result.
+TakeMeter classifies Hacker News titles by the communicative purpose visible in
+the title. The four labels are unchanged from the Part 1 submission.
 
 ## Label taxonomy
 
@@ -67,46 +50,37 @@ or action.
 
 ## Dataset
 
-The final [`labels.csv`](labels.csv) contains 250 unique Hacker News titles with
-`text`, `label`, and `note` columns.
+Part 2 began with the exact 250-row Part 1 dataset, frozen in
+[`data/labels_part2_before.csv`](data/labels_part2_before.csv):
 
-| Label | Rows | Share |
-|---|---:|---:|
-| `reported_event` | 97 | 38.8% |
-| `question_request` | 66 | 26.4% |
-| `perspective_explainer` | 52 | 20.8% |
-| `project_showcase` | 35 | 14.0% |
-| **Total** | **250** | **100.0%** |
+| Label | Before rows |
+|---|---:|
+| `reported_event` | 97 |
+| `question_request` | 66 |
+| `perspective_explainer` | 52 |
+| `project_showcase` | 35 |
+| **Total** | **250** |
 
-The original submission is preserved as
-[`data/labels_original_200.csv`](data/labels_original_200.csv). Its titles were
-rule-reviewed under the new title-level taxonomy with AI assistance, and the rebuild
-excluded 11 context-free titles such as “Moon,” “Sound,” and “IMG_0416” because
-a reader could not reproduce a semantic label from those strings alone.
+The one required improvement added 30 traceable Show HN examples to the
+thinnest and worst-performing label, `project_showcase`. The current
+[`labels.csv`](labels.csv) therefore contains 280 unique rows:
 
-Before augmentation, `question_request` was the thinnest new class with five
-usable rows. I collected 61 explicit Ask HN titles from the public HN Algolia
-API on October 25, 2026. This replaces the 11 exclusions and creates a net gain
-of exactly 50 usable examples. Every addition retains its Algolia object ID in
-[`data/added_question_requests.csv`](data/added_question_requests.csv), and
-[`rebuild_dataset.py`](rebuild_dataset.py) reproduces the final file.
+| Label | After rows |
+|---|---:|
+| `reported_event` | 97 |
+| `question_request` | 66 |
+| `project_showcase` | 65 |
+| `perspective_explainer` | 52 |
+| **Total** | **280** |
 
-Three boundary cases illustrate the rules:
-
-1. “A search engine that favors text-heavy sites and punishes modern web
-   design” could sound like a viewpoint, but it presents a specific artifact,
-   so it is `project_showcase`.
-2. “Google no longer producing high quality search results in significant
-   categories” could be read as news, but it is a broad evaluative claim, so it
-   is `perspective_explainer`.
-3. “Tell HN: Help restore the tax deduction for software dev in the US” names a
-   policy issue but explicitly asks readers to act, so it is
-   `question_request`.
+The additions and their HN Algolia object IDs are in
+[`data/added_project_showcases.csv`](data/added_project_showcases.csv).
+[`apply_part2_improvement.py`](apply_part2_improvement.py) applies only this
+change to the frozen before-data.
 
 ## Acceptance criteria
 
-The complete executable definitions and project-specific reasons are in
-[`criteria.md`](criteria.md). In summary:
+The five targets remain in [`criteria.md`](criteria.md), unchanged for Part 2:
 
 1. Held-out accuracy is at least 0.68.
 2. Held-out macro F1 is at least 0.62.
@@ -117,43 +91,60 @@ The complete executable definitions and project-specific reasons are in
 
 ## Training and reproducibility
 
-The base model is `distilbert-base-uncased`. The main after-run uses 3 epochs,
-learning rate `2e-5`, batch size 16, maximum length 128, a stratified 70/15/15
-split, and seeds 42, 7, and 2024. It ran on CPU with PyTorch 2.14.1.
+The base model is `distilbert-base-uncased`. Required before and after runs use
+3 epochs, learning rate `2e-5`, batch size 16, maximum length 128, stratified
+70/15/15 splits, and seeds 42, 7, and 2024. Runs used CPU with PyTorch 2.14.1.
 
 ```bash
 source .venv/bin/activate
 python test.py
-python rebuild_dataset.py
-python run_experiments.py --mode after
+python run_experiments.py --mode before
 python baseline.py --trained results.json
+python apply_part2_improvement.py
+python run_experiments.py --mode after
 python run_experiments.py --mode stretch
+python agreement.py
+python validate_submission.py
 ```
 
-Each new result contains its completion timestamp, row count, label
-distribution, settings, device, and dataset SHA-256. The main and stretch runs
-both record dataset hash
-`0256ae767d974264ea9b525bffcd8c6e6f13349ceed6c9ccab9f43f4fbfaa31c`,
-which proves the hyperparameter comparison used identical data.
+Every new result records its completion time, data hash, row count, label
+distribution, settings, and device.
 
-## AI use
+## How I used AI
 
-AI assisted with redesigning the title-level taxonomy, proposing the first
-relabeling pass, checking consistency, writing the reproducibility scripts, and
-summarizing the measured results. The added rows were not invented by a model:
-they are exact public Ask HN titles with retained Algolia IDs. The notes in the
-CSV disclose AI assistance instead of claiming the rebuilt labels were made
-fully unaided.
+AI helped check the Part 2 brief against the repository, structure the error
+analysis, implement provenance checks, and verify that the tables match the
+JSON artifacts. The new titles were not generated: they are exact public Show
+HN titles with retained Algolia IDs. AI assistance is disclosed in the data
+notes and was not used to change the frozen taxonomy or criteria.
 
-## Baseline versus trained model
+# Part 2 — Testing
 
-Before looking at the new scores, the prediction was that fine-tuning would
-beat the zero-shot baseline most clearly on `question_request`, because the
-explicit “Ask HN” signal appears repeatedly in the expanded data.
+## Part 2 plan — declared before experiments
 
-Both models below use the same 38 held-out seed-42 titles.
+The required improvement will add examples to `project_showcase` if the frozen
+before-run confirms that it is the thinnest and worst-performing label. The
+three stretch items planned before implementation are:
 
-| Measure | Zero-shot baseline | Trained, 3 epochs | Difference |
+1. compare accuracy in the most-confident and least-confident thirds;
+2. write a per-label error analysis for the label with the worst matrix row;
+3. measure a second improvement by changing only epochs from 3 to 4 and running
+   the same three seeds in the same five-criterion format.
+
+This declaration fixes the scope in advance: the required change is a data
+change, while the optional second change is reported separately and cannot be
+used to reinterpret the required before/after result.
+
+## Baseline vs. Trained
+
+Prediction written before viewing the rebuilt baseline: the fine-tuned model
+would beat the zero-shot model most clearly on `question_request`, because the
+training data contains repeated explicit “Ask HN” language.
+
+The prediction was wrong. Both models below were scored on the same 38 held-out
+seed-42 titles from the frozen before-data, and the zero-shot baseline won.
+
+| Measure | Zero-shot baseline | Trained | Difference |
 |---|---:|---:|---:|
 | Accuracy | 0.711 | 0.605 | -0.105 |
 | Macro F1 | 0.644 | 0.380 | -0.264 |
@@ -162,46 +153,30 @@ Both models below use the same 38 held-out seed-42 titles.
 | F1 — `project_showcase` | 0.333 | 0.000 | -0.333 |
 | F1 — `question_request` | 1.000 | 0.870 | -0.130 |
 
-The prediction was wrong: the baseline also recognized the explicit request
-language perfectly. Fine-tuning learned requests well but collapsed the two
-smaller, less formulaic classes into `reported_event`.
+The baseline could use the full written definitions directly. Fine-tuning with
+250 titles instead learned the two largest/easiest surface patterns and
+ignored the two less formulaic classes.
 
 ## Run Log — Before
 
-This is the preserved result from the original 200-row, three-label task. It is
-historical evidence, not a controlled comparison with the rebuilt taxonomy.
-
-| Criterion | Target | Seed 42 | Seed 7 | Seed 2024 |
-|---|---:|---:|---:|---:|
-| Accuracy | 0.68 | 0.500 | 0.533 | 0.600 |
-| Macro F1 | 0.62 | 0.222 | 0.280 | 0.409 |
-| Minimum per-label F1 | 0.50 | 0.000 | 0.000 | 0.000 |
-| Original `analysis` F1 | 0.60 | 0.667 | 0.698 | 0.706 |
-| Most-confident-third accuracy | 0.70 | 0.700 | 0.900 | 0.600 |
-
-The source artifact is
-[`results_three_seeds_before.json`](results_three_seeds_before.json). Its
-numbers are not copied into the after artifact.
-
-## Run Log — After
-
-This is the genuinely rerun 250-row, four-label experiment. The values come
-from [`results_three_seeds_after.json`](results_three_seeds_after.json).
+These values come from three genuine retrainings in
+[`results_three_seeds_before.json`](results_three_seeds_before.json).
 
 | Criterion | Target | Seed 42 | Seed 7 | Seed 2024 | Verdict |
 |---|---:|---:|---:|---:|---|
-| Accuracy | 0.68 | 0.605 | 0.632 | 0.658 | Missed |
-| Macro F1 | 0.62 | 0.380 | 0.398 | 0.421 | Missed |
-| Minimum per-label F1 | 0.50 | 0.000 | 0.000 | 0.000 | Missed |
-| `reported_event` F1 | 0.60 | 0.650 | 0.683 | 0.732 | Met |
-| Most-confident-third accuracy | 0.70 | 0.917 | 1.000 | 1.000 | Met |
+| 1. Overall accuracy | ≥ 0.68 | 0.605 | 0.632 | 0.658 | MISSED |
+| 2. Macro F1 | ≥ 0.62 | 0.380 | 0.398 | 0.421 | MISSED |
+| 3. Every label F1 | ≥ 0.50 | min 0.000 | min 0.000 | min 0.000 | MISSED |
+| 4. `reported_event` F1 | ≥ 0.60 | 0.650 | 0.683 | 0.732 | MET |
+| 5. Most-confident-third accuracy | ≥ 0.70 | 0.917 | 1.000 | 1.000 | MET |
 
-The changing values across seeds, new 38-row test distributions, completion
-timestamp, and dataset fingerprint provide evidence that the pipeline actually
-ran. Accuracy improves across the seeds but never reaches 0.68. The confidence
-criterion now holds for every seed.
+**Device beside the seeds:** seed 42 — `cpu`; seed 7 — `cpu`; seed 2024 — `cpu`.
 
-### Seed-42 confusion matrix
+Accuracy spans 0.053, below the ten-point instability warning. The result is
+stable enough to conclude that the model misses the 0.68 target rather than
+having received one unusually hostile split.
+
+### Before confusion matrix — seed 42
 
 | true \ predicted | reported_event | perspective_explainer | project_showcase | question_request |
 |---|---:|---:|---:|---:|
@@ -210,82 +185,205 @@ criterion now holds for every seed.
 | `project_showcase` | 4 | 0 | 0 | 1 |
 | `question_request` | 0 | 0 | 0 | 10 |
 
-The clearest success is the 10/10 request diagonal. The clearest remaining
-failure is that all eight perspectives and four of five showcases become
-`reported_event`; the model learns explicit prefixes faster than subtler
-semantic distinctions.
+The largest off-diagonal cell is eight real `perspective_explainer` titles
+called `reported_event`. The matrix also shows total failure on
+`project_showcase`: all five are sent elsewhere.
 
-## Stretch features
+## Verdicts and Diagnoses
 
-### Fourth label
+| # | Verdict and evidence |
+|---|---|
+| 1 | **MISSED.** All three accuracies are below 0.68. The matrix shows that the model uses only `reported_event` and `question_request`, so two unused output classes—not split variance—cause the miss. |
+| 2 | **MISSED.** Macro F1 is 0.380–0.421 because `perspective_explainer` and `project_showcase` both have 0.000 F1 on all three seeds. Macro averaging exposes the collapse that accuracy hides. |
+| 3 | **MISSED.** The minimum label F1 is 0.000 in every trial. `project_showcase` is also the thinnest class at 35 rows, which makes data scarcity a plausible cause; this directly motivates the improvement. |
+| 4 | **MET.** `reported_event` F1 is 0.650, 0.683, and 0.732, above 0.60 in every trial. |
+| 5 | **MET.** The top confidence third is 0.917, 1.000, and 1.000 accurate, above 0.70 in every trial. |
 
-`question_request` is a complete fourth label with a definition, examples,
-decision priority, 66 dataset rows, notebook support, baseline scores, trained
-scores, and confusion-matrix entries.
+The agreement exercise reached 83%, so it provides evidence that written-rule
+application can drift on subtle argument/reaction boundaries. It used a
+separate staff taxonomy, however, so it cannot by itself prove that the HN
+showcase boundary was mislabeled. For this task the direct evidence is the
+zero F1, the five seed-42 showcase errors, and the class's 35-row size.
 
-### Fifty additional examples for the thinnest label
+## Agreement Report
 
-Before augmentation, `question_request` had five usable legacy rows. Sixty-one
-traceable Ask HN rows were added while 11 ambiguous legacy rows were removed,
-giving a net increase of exactly 50 rows and a final class count of 66.
+Agreement was 25/30 = **83.3%**. All 30 of my labels matched a staff post; five
+labels disagreed. These calls use only the staff taxonomy in
+[`data/staff_taxonomy.md`](data/staff_taxonomy.md).
 
-### Second run with one hyperparameter changed
+### 1. Same session, different shoes
 
-The controlled stretch run changed only `epochs`, from 3 to 4, while retaining
-seed 42, the split, model, data hash, learning rate, batch size, and maximum
-length. Its artifact is
+> “Three of us ran the same session on the same day, different shoes, within
+> 10 seconds of each other over 5 miles. I'm not saying shoes do nothing, but
+> whatever they do was smaller than the noise between three people.”
+
+- Staff: `hot_take`; mine: `analysis`.
+- **My label is defensible.** The measured ten-second spread across three
+  runners is the stated reason for the limited conclusion about effect size;
+  the fact is load-bearing, not decorative. Rule 1 does not specify how many
+  observations make a comparison strong enough, so this belongs in pile (c):
+  the rule is ambiguous here and my reading remains defensible.
+
+### 2. Times down about 3%
+
+> “Times are down about 3% since the shoe rules changed, so obviously the
+> shoes are the whole story and the sport has a problem.”
+
+- Staff: `hot_take`; mine: `analysis`.
+- **Staff is right.** “Obviously” and “the whole story” leap past the statistic;
+  the 3% decorates a conclusion instead of establishing causation. Rule 1
+  covers this, so this is pile (a): I applied the rule loosely.
+
+### 3. Gel before 90 minutes
+
+> “If you need a gel before 90 minutes you have a fuelling problem, not an
+> energy problem.”
+
+- Staff: `hot_take`; mine: `analysis`.
+- **Staff is right.** Ninety minutes is a threshold, but no supporting
+  observation connects it to the general claim. This is pile (a): the rule
+  covered it, and I mistook a number for evidence.
+
+### 4. Watching the last 400
+
+> “Watching the last 400 of that and I had to stand up. Still standing up
+> actually.”
+
+- Staff: `reaction`; mine: `hot_take`.
+- **Staff is right.** The post reports the writer's immediate physical response
+  and makes no general claim. Rule 2 resolves it directly, so this is pile (a).
+
+### 5. Personal-best shoes were the wrong size
+
+> “Just realised the shoes I set every PB in this year are the ones I bought by
+> accident in the wrong size.”
+
+- Staff: `reaction`; mine: `hot_take`.
+- **Staff is right.** This describes a recent personal realization rather than
+  asserting a general rule about shoes. Under rule 2 it is a reaction, making
+  this another pile (a) application error.
+
+The disagreement pattern shows that I sometimes treated any number as
+analysis and underused reaction for first-person immediacy. Four cases were
+covered by the written rules; one comparison exposed a genuinely unspecified
+evidence-strength boundary.
+
+## The Improvement
+
+The single required change was adding 30 `project_showcase` examples. This was
+chosen because that label was both the thinnest (35 rows) and tied for worst F1
+(0.000 on all seeds). No label definition, criterion, model, split seed,
+learning rate, batch size, maximum length, or epoch count changed.
+
+### Run Log — After
+
+The results are in
+[`results_three_seeds_after.json`](results_three_seeds_after.json).
+
+| Criterion | Target | Seed 42 | Seed 7 | Seed 2024 | Verdict |
+|---|---:|---:|---:|---:|---|
+| 1. Overall accuracy | ≥ 0.68 | 0.690 | 0.643 | 0.619 | MISSED |
+| 2. Macro F1 | ≥ 0.62 | 0.587 | 0.520 | 0.501 | MISSED |
+| 3. Every label F1 | ≥ 0.50 | min 0.000 | min 0.000 | min 0.000 | MISSED |
+| 4. `reported_event` F1 | ≥ 0.60 | 0.683 | 0.667 | 0.650 | MET |
+| 5. Most-confident-third accuracy | ≥ 0.70 | 0.929 | 1.000 | 1.000 | MET |
+
+**Device beside the seeds:** seed 42 — `cpu`; seed 7 — `cpu`; seed 2024 — `cpu`.
+
+The improvement helped its intended label: `project_showcase` F1 moved from
+0.000/0.000/0.000 to 0.667/0.462/0.400, and macro F1 increased on every seed.
+Accuracy improved on seeds 42 and 7 but fell on seed 2024, so the accuracy
+criterion still misses. The change worked locally without fixing the whole
+classifier.
+
+### After confusion matrix — seed 42
+
+| true \ predicted | reported_event | perspective_explainer | project_showcase | question_request |
+|---|---:|---:|---:|---:|
+| `reported_event` | 14 | 0 | 0 | 0 |
+| `perspective_explainer` | 8 | 0 | 0 | 0 |
+| `project_showcase` | 5 | 0 | 5 | 0 |
+| `question_request` | 0 | 0 | 0 | 10 |
+
+## Stretch Features
+
+### Confidence check
+
+Confidence is the winning softmax probability. On both datasets, the highest
+confidence third is much more accurate than the lowest third:
+
+| Run | Seed | Most-confident third | Least-confident third |
+|---|---:|---:|---:|
+| Before | 42 | 0.917 | 0.083 |
+| Before | 7 | 1.000 | 0.167 |
+| Before | 2024 | 1.000 | 0.167 |
+| After | 42 | 0.929 | 0.500 |
+| After | 7 | 1.000 | 0.357 |
+| After | 2024 | 1.000 | 0.214 |
+
+The ranking is informative even though the full classifier misses three
+criteria: high-confidence predictions form a much safer review queue.
+
+### Second improvement
+
+The optional second improvement changed only epochs from 3 to 4 on the same
+280 rows and the same three seeds. Its results are in
 [`results_stretch_epochs4.json`](results_stretch_epochs4.json).
 
-| Measure | 3 epochs | 4 epochs | Change |
-|---|---:|---:|---:|
-| Accuracy | 0.605 | 0.605 | +0.000 |
-| Macro F1 | 0.380 | 0.386 | +0.006 |
-| F1 — `reported_event` | 0.650 | 0.634 | -0.016 |
-| F1 — `perspective_explainer` | 0.000 | 0.000 | +0.000 |
-| F1 — `project_showcase` | 0.000 | 0.000 | +0.000 |
-| F1 — `question_request` | 0.870 | 0.909 | +0.039 |
-| Most-confident-third accuracy | 0.917 | 0.917 | +0.000 |
+| Criterion | Target | Seed 42 | Seed 7 | Seed 2024 | Verdict |
+|---|---:|---:|---:|---:|---|
+| 1. Overall accuracy | ≥ 0.68 | 0.714 | 0.667 | 0.690 | MISSED |
+| 2. Macro F1 | ≥ 0.62 | 0.613 | 0.560 | 0.581 | MISSED |
+| 3. Every label F1 | ≥ 0.50 | min 0.000 | min 0.000 | min 0.000 | MISSED |
+| 4. `reported_event` F1 | ≥ 0.60 | 0.700 | 0.667 | 0.700 | MET |
+| 5. Most-confident-third accuracy | ≥ 0.70 | 0.929 | 1.000 | 1.000 | MET |
 
-The extra epoch changed the underlying metrics but did not fix class collapse.
-That is evidence of a real rerun and a negative result, not a copied table.
+**Device beside the seeds:** seed 42 — `cpu`; seed 7 — `cpu`; seed 2024 — `cpu`.
 
-## Agreement report
+The extra epoch improved accuracy, macro F1, and showcase F1 on all three
+seeds. It still did not make `perspective_explainer` learnable.
 
-The existing staff agreement exercise used the separate staff-provided running
-forum taxonomy, as required by that instrument, and remains preserved in
-[`agreement_results.json`](agreement_results.json). Agreement was 25/30 (83%).
-Four disagreements came from applying a clear staff rule too loosely; one was
-a genuinely ambiguous observation-versus-argument boundary. This historical
-check cannot validate the rebuilt HN taxonomy, so the rebuild instead makes
-every inclusion, exclusion, source ID, and rule auditable.
+### Worst-label error write-up: `perspective_explainer`
 
-## What's still broken
+`perspective_explainer` has 0.000 F1 across every before, after, and four-epoch
+run. In the after seed-42 matrix, all eight true perspective titles are called
+`reported_event`. Unlike “Ask HN” and “Show HN,” perspective titles have no
+consistent prefix; many contain names, numbers, or factual wording also common
+in event reports. Adding showcase rows therefore could not address this
+separate boundary. The next targeted test should collect varied perspectives
+paired with lexically similar event reports, then double-label that boundary
+before retraining.
 
-Three targets remain missed. The trained model does not reach 0.68 accuracy or
-0.62 macro F1, and the every-label target fails because
-`perspective_explainer` and `project_showcase` have zero F1. The seed-42 matrix
-shows the mechanism directly: those titles are overwhelmingly absorbed into
-`reported_event` even though `question_request` is recognized reliably.
+## What's Still Broken
 
-The next defensible change is not another test-set-tuned epoch. It is to collect
-more showcases and perspectives with explicit but varied linguistic cues,
-double-label a sample under the new rules, and reserve a fresh untouched test
-set before trying class weighting. I stopped here because evaluating further
-design choices against the same 38 titles would turn the held-out set into a
-development set.
+After the required improvement, criteria 1–3 still miss. For accuracy and
+macro F1, I would next address the total failure on `perspective_explainer`
+with boundary-paired examples and class weighting, validated on a new held-out
+set. For the every-label criterion, the same zero-F1 class is the direct cause.
+I stopped because another data or training change would violate the required
+one-change before/after experiment; the four-epoch result is reported
+separately as stretch work.
+
+I meant the labels to separate checkable developments from interpretation,
+artifact presentation, and requests. The model actually learned explicit
+request/showcase cues and a broad event default: the after matrix sends all
+eight perspectives to `reported_event`, which is the remaining gap between the
+taxonomy and the learned decision rule.
 
 ## Artifacts
 
-- [`labels.csv`](labels.csv): final 250-row dataset
-- [`data/labels_original_200.csv`](data/labels_original_200.csv): original data
-- [`data/added_question_requests.csv`](data/added_question_requests.csv): added rows and source IDs
-- [`results_three_seeds_before.json`](results_three_seeds_before.json): original run
-- [`results_three_seeds_after.json`](results_three_seeds_after.json): genuine rebuilt run
-- [`results_stretch_epochs4.json`](results_stretch_epochs4.json): controlled stretch run
-- [`results.json`](results.json) and [`test_split.csv`](test_split.csv): seed-42 rebuilt run
-- [`baseline_results.json`](baseline_results.json): rebuilt zero-shot baseline
-- [`agreement_results.json`](agreement_results.json): staff agreement exercise
-- [`takemeter.ipynb`](takemeter.ipynb): notebook configured for all four labels
-- [`run_experiments.py`](run_experiments.py): reproducible experiment runner
+- [`criteria.md`](criteria.md): unchanged Part 1 acceptance criteria
+- [`data/labels_part2_before.csv`](data/labels_part2_before.csv): frozen before-data
+- [`labels.csv`](labels.csv): 280-row data after the one required improvement
+- [`data/added_project_showcases.csv`](data/added_project_showcases.csv): 30 traceable additions
+- [`results_three_seeds_before.json`](results_three_seeds_before.json): required before run
+- [`results_three_seeds_after.json`](results_three_seeds_after.json): required after run
+- [`results_stretch_epochs4.json`](results_stretch_epochs4.json): second improvement
+- [`baseline_results.json`](baseline_results.json): zero-shot baseline
+- [`agreement_results.json`](agreement_results.json): 25/30 agreement and disagreements
+- [`my_staff_labels.csv`](my_staff_labels.csv): my 30 staff-taxonomy labels
+- [`results.json`](results.json) and [`test_split.csv`](test_split.csv): frozen seed-42 before evidence
+- [`run_experiments.py`](run_experiments.py): reproducible three-seed runner
+- [`validate_submission.py`](validate_submission.py): automated evidence checks
 
 See [`RUNNING.md`](RUNNING.md) for environment details.
