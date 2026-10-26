@@ -1,54 +1,94 @@
 {
   "seed": 42,
-  "n_test": 30,
-  "accuracy": 0.5,
-  "f1_macro": 0.2222222222222222,
+  "n_test": 38,
+  "test_distribution": {
+    "project_showcase": 5,
+    "reported_event": 15,
+    "perspective_explainer": 8,
+    "question_request": 10
+  },
+  "accuracy": 0.6052631578947368,
+  "f1_macro": 0.3798913043478261,
   "per_label": {
-    "analysis": {
-      "precision": 0.5,
-      "recall": 1.0,
-      "f1": 0.6666666666666666,
+    "reported_event": {
+      "precision": 0.52,
+      "recall": 0.8666666666666667,
+      "f1": 0.65,
       "support": 15
     },
-    "hot_take": {
+    "perspective_explainer": {
       "precision": 0.0,
       "recall": 0.0,
       "f1": 0.0,
-      "support": 12
+      "support": 8
     },
-    "reaction": {
+    "project_showcase": {
       "precision": 0.0,
       "recall": 0.0,
       "f1": 0.0,
-      "support": 3
+      "support": 5
+    },
+    "question_request": {
+      "precision": 0.7692307692307693,
+      "recall": 1.0,
+      "f1": 0.8695652173913043,
+      "support": 10
     }
   },
   "confusion": {
-    "analysis": {
-      "analysis": 15,
-      "hot_take": 0,
-      "reaction": 0
+    "reported_event": {
+      "reported_event": 13,
+      "perspective_explainer": 0,
+      "project_showcase": 0,
+      "question_request": 2
     },
-    "hot_take": {
-      "analysis": 12,
-      "hot_take": 0,
-      "reaction": 0
+    "perspective_explainer": {
+      "reported_event": 8,
+      "perspective_explainer": 0,
+      "project_showcase": 0,
+      "question_request": 0
     },
-    "reaction": {
-      "analysis": 3,
-      "hot_take": 0,
-      "reaction": 0
+    "project_showcase": {
+      "reported_event": 4,
+      "perspective_explainer": 0,
+      "project_showcase": 0,
+      "question_request": 1
+    },
+    "question_request": {
+      "reported_event": 0,
+      "perspective_explainer": 0,
+      "project_showcase": 0,
+      "question_request": 10
     }
   },
   "confidence": {
-    "mean_when_right": 0.503226637840271,
-    "mean_when_wrong": 0.4825320839881897,
-    "accuracy_most_confident_third": 0.7,
-    "accuracy_least_confident_third": 0.4,
-    "n_per_third": 10
+    "definition": "winning softmax probability; highest-ranked third",
+    "accuracy_most_confident_third": 0.9166666666666666,
+    "n_most_confident_third": 12
   },
-  "device": "mps",
-  "device_name": "Apple Silicon GPU (MPS)",
-  "torch_version": "2.14.1",
-  "max_length": 128
+  "provenance": {
+    "run_completed_utc": "2026-10-26T00:09:24.334354+00:00",
+    "dataset": "labels.csv",
+    "dataset_sha256": "0256ae767d974264ea9b525bffcd8c6e6f13349ceed6c9ccab9f43f4fbfaa31c",
+    "row_count": 250,
+    "label_distribution": {
+      "reported_event": 97,
+      "perspective_explainer": 52,
+      "project_showcase": 35,
+      "question_request": 66
+    },
+    "labels": [
+      "reported_event",
+      "perspective_explainer",
+      "project_showcase",
+      "question_request"
+    ],
+    "base_model": "distilbert-base-uncased",
+    "epochs": 3,
+    "learning_rate": 2e-05,
+    "batch_size": 16,
+    "max_length": 128,
+    "device": "cpu",
+    "torch_version": "2.14.1"
+  }
 }

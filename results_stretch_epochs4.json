@@ -1,0 +1,96 @@
+[
+  {
+    "seed": 42,
+    "n_test": 38,
+    "test_distribution": {
+      "project_showcase": 5,
+      "reported_event": 15,
+      "perspective_explainer": 8,
+      "question_request": 10
+    },
+    "accuracy": 0.6052631578947368,
+    "f1_macro": 0.3858093126385809,
+    "per_label": {
+      "reported_event": {
+        "precision": 0.5,
+        "recall": 0.8666666666666667,
+        "f1": 0.6341463414634146,
+        "support": 15
+      },
+      "perspective_explainer": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "support": 8
+      },
+      "project_showcase": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "support": 5
+      },
+      "question_request": {
+        "precision": 0.8333333333333334,
+        "recall": 1.0,
+        "f1": 0.9090909090909091,
+        "support": 10
+      }
+    },
+    "confusion": {
+      "reported_event": {
+        "reported_event": 13,
+        "perspective_explainer": 0,
+        "project_showcase": 0,
+        "question_request": 2
+      },
+      "perspective_explainer": {
+        "reported_event": 8,
+        "perspective_explainer": 0,
+        "project_showcase": 0,
+        "question_request": 0
+      },
+      "project_showcase": {
+        "reported_event": 5,
+        "perspective_explainer": 0,
+        "project_showcase": 0,
+        "question_request": 0
+      },
+      "question_request": {
+        "reported_event": 0,
+        "perspective_explainer": 0,
+        "project_showcase": 0,
+        "question_request": 10
+      }
+    },
+    "confidence": {
+      "definition": "winning softmax probability; highest-ranked third",
+      "accuracy_most_confident_third": 0.9166666666666666,
+      "n_most_confident_third": 12
+    },
+    "provenance": {
+      "run_completed_utc": "2026-10-26T00:10:54.340919+00:00",
+      "dataset": "labels.csv",
+      "dataset_sha256": "0256ae767d974264ea9b525bffcd8c6e6f13349ceed6c9ccab9f43f4fbfaa31c",
+      "row_count": 250,
+      "label_distribution": {
+        "reported_event": 97,
+        "perspective_explainer": 52,
+        "project_showcase": 35,
+        "question_request": 66
+      },
+      "labels": [
+        "reported_event",
+        "perspective_explainer",
+        "project_showcase",
+        "question_request"
+      ],
+      "base_model": "distilbert-base-uncased",
+      "epochs": 4,
+      "learning_rate": 2e-05,
+      "batch_size": 16,
+      "max_length": 128,
+      "device": "cpu",
+      "torch_version": "2.14.1"
+    }
+  }
+]

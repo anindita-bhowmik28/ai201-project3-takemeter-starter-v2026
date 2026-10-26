@@ -1,31 +1,39 @@
 text,label,note
-Switch from Chrome to Firefox,hot_take,public HN story; human-labeled with project rule
-WhatsApp gives users an ultimatum: Share data with Facebook or stop using app,analysis,public HN story; human-labeled with project rule
-Apple Vision Pro: Apple’s first spatial computer,hot_take,public HN story; human-labeled with project rule
-Mazda is purging touchscreens from its vehicles,hot_take,public HN story; human-labeled with project rule
-Paul Allen has died,reaction,public HN story; human-labeled with project rule
-Valve Steam Deck,hot_take,public HN story; human-labeled with project rule
-I am an Uber survivor,hot_take,public HN story; human-labeled with project rule
-John Ternus to become Apple CEO,hot_take,public HN story; human-labeled with project rule
-Cloudflare Global Network experiencing issues,analysis,public HN story; human-labeled with project rule
-"Julian Assange has reached a plea deal with the U.S., allowing him to go free",reaction,public HN story; human-labeled with project rule
-"“Click to subscribe, call to cancel” is illegal, FTC says",analysis,public HN story; human-labeled with project rule
-Russian forces invade Ukraine after Putin orders attack,analysis,public HN story; human-labeled with project rule
-Don't post generated/AI-edited comments. HN is for conversation between humans,analysis,public HN story; human-labeled with project rule
-LK-99 isn’t a superconductor,analysis,public HN story; human-labeled with project rule
-Ghostty is leaving GitHub,reaction,public HN story; human-labeled with project rule
-Oppose the Earn IT Act,hot_take,public HN story; human-labeled with project rule
-Statement on US government directive to suspend access to Fable 5 and Mythos 5,analysis,public HN story; human-labeled with project rule
-Airfoil,analysis,public HN story; human-labeled with project rule
-Git commands I run before reading any code,analysis,public HN story; human-labeled with project rule
-Show HN: This up votes itself,hot_take,public HN story; human-labeled with project rule
-Stimulation Clicker,hot_take,public HN story; human-labeled with project rule
-G is for Google,analysis,public HN story; human-labeled with project rule
-Seven earth-sized planets discovered circling a star 39 light years from Earth,analysis,public HN story; human-labeled with project rule
-Bose has released API docs and opened the API for its EoL SoundTouch speakers,analysis,public HN story; human-labeled with project rule
-Show HN: A retro video game console I've been working on in my free time,hot_take,public HN story; human-labeled with project rule
-F.C.C. Repeals Net Neutrality Rules,analysis,public HN story; human-labeled with project rule
-Google will allow only apps from verified developers to be installed on Android,analysis,public HN story; human-labeled with project rule
-Facebook-owned sites were down,hot_take,public HN story; human-labeled with project rule
-Google outage – resolved,analysis,public HN story; human-labeled with project rule
-FDIC Takes over Silicon Valley Bank,hot_take,public HN story; human-labeled with project rule
+Daylight Computer – New 60fps e-paper tablet,project_showcase,legacy HN title; AI-assisted relabel under title-level taxonomy; rule-reviewed
+Stack Overflow sold to Prosus for $1.8B,reported_event,legacy HN title; AI-assisted relabel under title-level taxonomy; rule-reviewed
+An Unbelievable Demo,project_showcase,legacy HN title; AI-assisted relabel under title-level taxonomy; rule-reviewed
+Google no longer producing high quality search results in significant categories,perspective_explainer,legacy HN title; AI-assisted relabel under title-level taxonomy; rule-reviewed
+Statement from Dario Amodei on our discussions with the Department of War,reported_event,legacy HN title; AI-assisted relabel under title-level taxonomy; rule-reviewed
+macOS unable to open any non-Apple application,reported_event,legacy HN title; AI-assisted relabel under title-level taxonomy; rule-reviewed
+Nvidia releases open-source GPU kernel modules,reported_event,legacy HN title; AI-assisted relabel under title-level taxonomy; rule-reviewed
+Reverse engineering Ticketmaster's rotating barcodes,perspective_explainer,legacy HN title; AI-assisted relabel under title-level taxonomy; rule-reviewed
+Slack has raised our charges by $195k per year,reported_event,legacy HN title; AI-assisted relabel under title-level taxonomy; rule-reviewed
+Announcing the first SHA-1 collision,reported_event,legacy HN title; AI-assisted relabel under title-level taxonomy; rule-reviewed
+A foreign seller has hijacked my Amazon Klein bottle listing,perspective_explainer,legacy HN title; AI-assisted relabel under title-level taxonomy; rule-reviewed
+Sora: Creating video from text,project_showcase,legacy HN title; AI-assisted relabel under title-level taxonomy; rule-reviewed
+Ask HN: How has your company adapted interviews in the AI world?,question_request,HN Algolia objectID 50191025; collected 2026-10-25; explicit Ask HN prefix
+Microsoft takes .NET open source and cross-platform,reported_event,legacy HN title; AI-assisted relabel under title-level taxonomy; rule-reviewed
+I am an Uber survivor,perspective_explainer,legacy HN title; AI-assisted relabel under title-level taxonomy; rule-reviewed
+Ask HN: Should HN add a 'Show AI' prefix for AI-related or AI-assisted projects?,question_request,HN Algolia objectID 50197422; collected 2026-10-25; explicit Ask HN prefix
+Ask HN: Anyone patching servers by prompting AI instead of SSH/remote desktop?,question_request,HN Algolia objectID 50192671; collected 2026-10-25; explicit Ask HN prefix
+Show HN: A retro video game console I've been working on in my free time,project_showcase,legacy HN title; AI-assisted relabel under title-level taxonomy; rule-reviewed
+Self-driving Uber car kills Arizona woman crossing street,reported_event,legacy HN title; AI-assisted relabel under title-level taxonomy; rule-reviewed
+Keep Android Open,perspective_explainer,legacy HN title; AI-assisted relabel under title-level taxonomy; rule-reviewed
+My First Impressions of Web3,perspective_explainer,legacy HN title; AI-assisted relabel under title-level taxonomy; rule-reviewed
+I Am Deleting the Blog,perspective_explainer,legacy HN title; AI-assisted relabel under title-level taxonomy; rule-reviewed
+Ask HN: How do people self host email and maintain deliverability?,question_request,HN Algolia objectID 50218062; collected 2026-10-25; explicit Ask HN prefix
+Gordon Moore has died,reported_event,legacy HN title; AI-assisted relabel under title-level taxonomy; rule-reviewed
+Bing: “I will not harm you unless you harm me first”,reported_event,legacy HN title; AI-assisted relabel under title-level taxonomy; rule-reviewed
+The Framework Laptop,project_showcase,legacy HN title; AI-assisted relabel under title-level taxonomy; rule-reviewed
+Announcing unlimited free private repos,reported_event,legacy HN title; AI-assisted relabel under title-level taxonomy; rule-reviewed
+Ask HN: Why did my post get [flagged]?,question_request,HN Algolia objectID 50219582; collected 2026-10-25; explicit Ask HN prefix
+Elon Musk makes $43B unsolicited bid to take Twitter private,reported_event,legacy HN title; AI-assisted relabel under title-level taxonomy; rule-reviewed
+Ask HN: Which companies do you admire and why?,question_request,HN Algolia objectID 50191604; collected 2026-10-25; explicit Ask HN prefix
+Ask HN: What do you think about lightweight default games on Linux distros?,question_request,HN Algolia objectID 50206531; collected 2026-10-25; explicit Ask HN prefix
+Someone is pretending to be me,perspective_explainer,legacy HN title; AI-assisted relabel under title-level taxonomy; rule-reviewed
+Zelensky leaves White House after angry meeting,reported_event,legacy HN title; AI-assisted relabel under title-level taxonomy; rule-reviewed
+Ask HN: When did you last visit or use stackoverflow?,question_request,HN Algolia objectID 50214645; collected 2026-10-25; explicit Ask HN prefix
+Thank HN: My bootstrapped startup got acquired today,reported_event,legacy HN title; AI-assisted relabel under title-level taxonomy; rule-reviewed
+"Ask HN: Linux at work revoked due to MDM, how to fight?",question_request,HN Algolia objectID 50220301; collected 2026-10-25; explicit Ask HN prefix
+"Ask HN: If the models are so good, why doesn't OpenAI just start 100 companies?",question_request,HN Algolia objectID 50200997; collected 2026-10-25; explicit Ask HN prefix
+IBM acquires Red Hat,reported_event,legacy HN title; AI-assisted relabel under title-level taxonomy; rule-reviewed

@@ -1,184 +1,230 @@
 {
   "model": "facebook/bart-large-mnli",
-  "n": 30,
+  "n": 38,
   "seed": 42,
   "held_out": true,
   "used_definitions": true,
   "scores": {
-    "n": 30,
-    "accuracy": 0.4666666666666667,
-    "f1_macro": 0.4761904761904762,
+    "n": 38,
+    "accuracy": 0.7105263157894737,
+    "f1_macro": 0.6440972222222222,
     "per_label": {
-      "analysis": {
-        "precision": 0.5384615384615384,
-        "recall": 0.4666666666666667,
-        "f1": 0.5,
-        "support": 15
+      "perspective_explainer": {
+        "precision": 0.5,
+        "recall": 0.625,
+        "f1": 0.5555555555555556,
+        "support": 8
       },
-      "hot_take": {
-        "precision": 0.375,
-        "recall": 0.5,
-        "f1": 0.42857142857142855,
-        "support": 12
-      },
-      "reaction": {
+      "project_showcase": {
         "precision": 1.0,
-        "recall": 0.3333333333333333,
-        "f1": 0.5,
-        "support": 3
+        "recall": 0.2,
+        "f1": 0.33333333333333337,
+        "support": 5
+      },
+      "question_request": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "support": 10
+      },
+      "reported_event": {
+        "precision": 0.6470588235294118,
+        "recall": 0.7333333333333333,
+        "f1": 0.6875,
+        "support": 15
       }
     }
   },
   "predictions": [
     {
-      "text": "Switch from Chrome to Firefox",
-      "gold": "hot_take",
-      "predicted": "analysis"
+      "text": "Daylight Computer \u2013 New 60fps e-paper tablet",
+      "gold": "project_showcase",
+      "predicted": "reported_event"
     },
     {
-      "text": "WhatsApp gives users an ultimatum: Share data with Facebook or stop using app",
-      "gold": "analysis",
-      "predicted": "hot_take"
+      "text": "Stack Overflow sold to Prosus for $1.8B",
+      "gold": "reported_event",
+      "predicted": "reported_event"
     },
     {
-      "text": "Apple Vision Pro: Apple\u2019s first spatial computer",
-      "gold": "hot_take",
-      "predicted": "analysis"
+      "text": "An Unbelievable Demo",
+      "gold": "project_showcase",
+      "predicted": "reported_event"
     },
     {
-      "text": "Mazda is purging touchscreens from its vehicles",
-      "gold": "hot_take",
-      "predicted": "analysis"
+      "text": "Google no longer producing high quality search results in significant categories",
+      "gold": "perspective_explainer",
+      "predicted": "perspective_explainer"
     },
     {
-      "text": "Paul Allen has died",
-      "gold": "reaction",
-      "predicted": "reaction"
+      "text": "Statement from Dario Amodei on our discussions with the Department of War",
+      "gold": "reported_event",
+      "predicted": "reported_event"
     },
     {
-      "text": "Valve Steam Deck",
-      "gold": "hot_take",
-      "predicted": "analysis"
+      "text": "macOS unable to open any non-Apple application",
+      "gold": "reported_event",
+      "predicted": "reported_event"
+    },
+    {
+      "text": "Nvidia releases open-source GPU kernel modules",
+      "gold": "reported_event",
+      "predicted": "reported_event"
+    },
+    {
+      "text": "Reverse engineering Ticketmaster's rotating barcodes",
+      "gold": "perspective_explainer",
+      "predicted": "perspective_explainer"
+    },
+    {
+      "text": "Slack has raised our charges by $195k per year",
+      "gold": "reported_event",
+      "predicted": "perspective_explainer"
+    },
+    {
+      "text": "Announcing the first SHA-1 collision",
+      "gold": "reported_event",
+      "predicted": "reported_event"
+    },
+    {
+      "text": "A foreign seller has hijacked my Amazon Klein bottle listing",
+      "gold": "perspective_explainer",
+      "predicted": "reported_event"
+    },
+    {
+      "text": "Sora: Creating video from text",
+      "gold": "project_showcase",
+      "predicted": "perspective_explainer"
+    },
+    {
+      "text": "Ask HN: How has your company adapted interviews in the AI world?",
+      "gold": "question_request",
+      "predicted": "question_request"
+    },
+    {
+      "text": "Microsoft takes .NET open source and cross-platform",
+      "gold": "reported_event",
+      "predicted": "perspective_explainer"
     },
     {
       "text": "I am an Uber survivor",
-      "gold": "hot_take",
-      "predicted": "analysis"
+      "gold": "perspective_explainer",
+      "predicted": "reported_event"
     },
     {
-      "text": "John Ternus to become Apple CEO",
-      "gold": "hot_take",
-      "predicted": "hot_take"
+      "text": "Ask HN: Should HN add a 'Show AI' prefix for AI-related or AI-assisted projects?",
+      "gold": "question_request",
+      "predicted": "question_request"
     },
     {
-      "text": "Cloudflare Global Network experiencing issues",
-      "gold": "analysis",
-      "predicted": "hot_take"
-    },
-    {
-      "text": "Julian Assange has reached a plea deal with the U.S., allowing him to go free",
-      "gold": "reaction",
-      "predicted": "hot_take"
-    },
-    {
-      "text": "\u201cClick to subscribe, call to cancel\u201d is illegal, FTC says",
-      "gold": "analysis",
-      "predicted": "hot_take"
-    },
-    {
-      "text": "Russian forces invade Ukraine after Putin orders attack",
-      "gold": "analysis",
-      "predicted": "hot_take"
-    },
-    {
-      "text": "Don't post generated/AI-edited comments. HN is for conversation between humans",
-      "gold": "analysis",
-      "predicted": "hot_take"
-    },
-    {
-      "text": "LK-99 isn\u2019t a superconductor",
-      "gold": "analysis",
-      "predicted": "analysis"
-    },
-    {
-      "text": "Ghostty is leaving GitHub",
-      "gold": "reaction",
-      "predicted": "hot_take"
-    },
-    {
-      "text": "Oppose the Earn IT Act",
-      "gold": "hot_take",
-      "predicted": "hot_take"
-    },
-    {
-      "text": "Statement on US government directive to suspend access to Fable 5 and Mythos 5",
-      "gold": "analysis",
-      "predicted": "hot_take"
-    },
-    {
-      "text": "Airfoil",
-      "gold": "analysis",
-      "predicted": "analysis"
-    },
-    {
-      "text": "Git commands I run before reading any code",
-      "gold": "analysis",
-      "predicted": "hot_take"
-    },
-    {
-      "text": "Show HN: This up votes itself",
-      "gold": "hot_take",
-      "predicted": "hot_take"
-    },
-    {
-      "text": "Stimulation Clicker",
-      "gold": "hot_take",
-      "predicted": "hot_take"
-    },
-    {
-      "text": "G is for Google",
-      "gold": "analysis",
-      "predicted": "analysis"
-    },
-    {
-      "text": "Seven earth-sized planets discovered circling a star 39 light years from Earth",
-      "gold": "analysis",
-      "predicted": "analysis"
-    },
-    {
-      "text": "Bose has released API docs and opened the API for its EoL SoundTouch speakers",
-      "gold": "analysis",
-      "predicted": "analysis"
+      "text": "Ask HN: Anyone patching servers by prompting AI instead of SSH/remote desktop?",
+      "gold": "question_request",
+      "predicted": "question_request"
     },
     {
       "text": "Show HN: A retro video game console I've been working on in my free time",
-      "gold": "hot_take",
-      "predicted": "analysis"
+      "gold": "project_showcase",
+      "predicted": "project_showcase"
     },
     {
-      "text": "F.C.C. Repeals Net Neutrality Rules",
-      "gold": "analysis",
-      "predicted": "hot_take"
+      "text": "Self-driving Uber car kills Arizona woman crossing street",
+      "gold": "reported_event",
+      "predicted": "reported_event"
     },
     {
-      "text": "Google will allow only apps from verified developers to be installed on Android",
-      "gold": "analysis",
-      "predicted": "analysis"
+      "text": "Keep Android Open",
+      "gold": "perspective_explainer",
+      "predicted": "perspective_explainer"
     },
     {
-      "text": "Facebook-owned sites were down",
-      "gold": "hot_take",
-      "predicted": "hot_take"
+      "text": "My First Impressions of Web3",
+      "gold": "perspective_explainer",
+      "predicted": "perspective_explainer"
     },
     {
-      "text": "Google outage \u2013 resolved",
-      "gold": "analysis",
-      "predicted": "analysis"
+      "text": "I Am Deleting the Blog",
+      "gold": "perspective_explainer",
+      "predicted": "reported_event"
     },
     {
-      "text": "FDIC Takes over Silicon Valley Bank",
-      "gold": "hot_take",
-      "predicted": "hot_take"
+      "text": "Ask HN: How do people self host email and maintain deliverability?",
+      "gold": "question_request",
+      "predicted": "question_request"
+    },
+    {
+      "text": "Gordon Moore has died",
+      "gold": "reported_event",
+      "predicted": "reported_event"
+    },
+    {
+      "text": "Bing: \u201cI will not harm you unless you harm me first\u201d",
+      "gold": "reported_event",
+      "predicted": "perspective_explainer"
+    },
+    {
+      "text": "The Framework Laptop",
+      "gold": "project_showcase",
+      "predicted": "reported_event"
+    },
+    {
+      "text": "Announcing unlimited free private repos",
+      "gold": "reported_event",
+      "predicted": "reported_event"
+    },
+    {
+      "text": "Ask HN: Why did my post get [flagged]?",
+      "gold": "question_request",
+      "predicted": "question_request"
+    },
+    {
+      "text": "Elon Musk makes $43B unsolicited bid to take Twitter private",
+      "gold": "reported_event",
+      "predicted": "reported_event"
+    },
+    {
+      "text": "Ask HN: Which companies do you admire and why?",
+      "gold": "question_request",
+      "predicted": "question_request"
+    },
+    {
+      "text": "Ask HN: What do you think about lightweight default games on Linux distros?",
+      "gold": "question_request",
+      "predicted": "question_request"
+    },
+    {
+      "text": "Someone is pretending to be me",
+      "gold": "perspective_explainer",
+      "predicted": "perspective_explainer"
+    },
+    {
+      "text": "Zelensky leaves White House after angry meeting",
+      "gold": "reported_event",
+      "predicted": "perspective_explainer"
+    },
+    {
+      "text": "Ask HN: When did you last visit or use stackoverflow?",
+      "gold": "question_request",
+      "predicted": "question_request"
+    },
+    {
+      "text": "Thank HN: My bootstrapped startup got acquired today",
+      "gold": "reported_event",
+      "predicted": "reported_event"
+    },
+    {
+      "text": "Ask HN: Linux at work revoked due to MDM, how to fight?",
+      "gold": "question_request",
+      "predicted": "question_request"
+    },
+    {
+      "text": "Ask HN: If the models are so good, why doesn't OpenAI just start 100 companies?",
+      "gold": "question_request",
+      "predicted": "question_request"
+    },
+    {
+      "text": "IBM acquires Red Hat",
+      "gold": "reported_event",
+      "predicted": "reported_event"
     }
   ]
 }
