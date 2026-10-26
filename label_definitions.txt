@@ -1,3 +1,4 @@
-analysis: a post that uses a specific, checkable fact, statistic, technical detail, or concrete example to support a claim
-hot_take: a strong claim or opinion with a clear point of view but without a concrete fact or evidence attached
-reaction: an immediate response to a breaking event, a loss, or a public shock, usually framed as a short reaction rather than an argument
+reported_event: A title that states a concrete event, status, finding, outage, policy change, acquisition, death, or other checkable development.
+perspective_explainer: A title that presents a personal view, recommendation, argument, reflection, interpretation, or explanation rather than primarily announcing a project or requesting answers.
+project_showcase: A title whose main purpose is to present, demonstrate, launch, or name a specific tool, model, product, creative work, or Show HN project.
+question_request: A title that explicitly asks the HN community for information, advice, recommendations, help, or action, including Ask HN and direct help requests.
