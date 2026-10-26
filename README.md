@@ -5,6 +5,21 @@ The rebuilt task deliberately uses signals that are present in the input text,
 rather than asking a short title to reveal whether an unseen article contains
 supporting evidence.
 
+## Part 2 plan — declared before experiments
+
+The required improvement will add examples to `project_showcase` if the frozen
+before-run confirms that it is the thinnest and worst-performing label. The
+three stretch items planned before implementation are:
+
+1. compare accuracy in the most-confident and least-confident thirds;
+2. write a per-label error analysis for the label with the worst matrix row;
+3. measure a second improvement by changing only epochs from 3 to 4 and running
+   the same three seeds in the same five-criterion format.
+
+This declaration fixes the scope in advance: the required change is a data
+change, while the optional second change is reported separately and cannot be
+used to reinterpret the required before/after result.
+
 ## Label taxonomy
 
 ### `reported_event`
