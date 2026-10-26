@@ -63,12 +63,15 @@
   },
   "confidence": {
     "definition": "winning softmax probability; highest-ranked third",
+    "mean_when_right": 0.5139302611351013,
+    "mean_when_wrong": 0.38720449805259705,
     "accuracy_most_confident_third": 0.9166666666666666,
+    "accuracy_least_confident_third": 0.08333333333333333,
     "n_most_confident_third": 12
   },
   "provenance": {
-    "run_completed_utc": "2026-10-26T00:09:24.334354+00:00",
-    "dataset": "labels.csv",
+    "run_completed_utc": "2026-10-26T00:54:48.226872+00:00",
+    "dataset": "labels_part2_before.csv",
     "dataset_sha256": "0256ae767d974264ea9b525bffcd8c6e6f13349ceed6c9ccab9f43f4fbfaa31c",
     "row_count": 250,
     "label_distribution": {

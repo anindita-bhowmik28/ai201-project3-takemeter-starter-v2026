@@ -84,7 +84,7 @@ def evaluate(trainer, dataset, test_frame, seed):
     right = gold == predicted
     ranked = np.argsort(confidence, kind="stable")
     third = max(1, len(gold) // 3)
-    most = ranked[-third:]
+    least, most = ranked[:third], ranked[-third:]
     precision, recall, f1, support = precision_recall_fscore_support(
         gold, predicted, labels=range(len(LABELS)), zero_division=0
     )
@@ -106,7 +106,10 @@ def evaluate(trainer, dataset, test_frame, seed):
         "confusion": confusion_counts(gold, predicted),
         "confidence": {
             "definition": "winning softmax probability; highest-ranked third",
+            "mean_when_right": float(confidence[right].mean()) if right.any() else None,
+            "mean_when_wrong": float(confidence[~right].mean()) if (~right).any() else None,
             "accuracy_most_confident_third": float(right[most].mean()),
+            "accuracy_least_confident_third": float(right[least].mean()),
             "n_most_confident_third": int(third),
         },
     }
@@ -172,16 +175,20 @@ def provenance(data_path: Path, df: pd.DataFrame, epochs: int):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--mode", choices=["after", "stretch"], required=True)
+    parser.add_argument("--mode", choices=["before", "after", "stretch"], required=True)
     args = parser.parse_args()
-    data_path = ROOT / "labels.csv"
+    data_path = (
+        ROOT / "data" / "labels_part2_before.csv"
+        if args.mode == "before"
+        else ROOT / "labels.csv"
+    )
     df = pd.read_csv(data_path)
     found = set(df["label"])
     if found != set(LABELS):
         raise SystemExit(f"Expected labels {LABELS}; found {sorted(found)}")
 
-    epochs = 3 if args.mode == "after" else 4
-    seeds = SEEDS if args.mode == "after" else [42]
+    epochs = 4 if args.mode == "stretch" else 3
+    seeds = SEEDS
     metadata = provenance(data_path, df, epochs)
     print(json.dumps(metadata, indent=2))
     results = []
@@ -195,10 +202,12 @@ def main():
             seed_42_test = test
         print(f"accuracy={result['accuracy']:.3f} macro_f1={result['f1_macro']:.3f}")
 
-    if args.mode == "after":
-        output = ROOT / "results_three_seeds_after.json"
+    if args.mode == "before":
+        output = ROOT / "results_three_seeds_before.json"
         (ROOT / "results.json").write_text(json.dumps(results[0], indent=2) + "\n")
         seed_42_test.to_csv(ROOT / "test_split.csv", index=False)
+    elif args.mode == "after":
+        output = ROOT / "results_three_seeds_after.json"
     else:
         output = ROOT / "results_stretch_epochs4.json"
     output.write_text(json.dumps(results, indent=2) + "\n")
