@@ -1,21 +1,21 @@
 [
   {
     "seed": 42,
-    "n_test": 38,
+    "n_test": 42,
     "test_distribution": {
-      "project_showcase": 5,
-      "reported_event": 15,
+      "question_request": 10,
       "perspective_explainer": 8,
-      "question_request": 10
+      "reported_event": 14,
+      "project_showcase": 10
     },
-    "accuracy": 0.6052631578947368,
-    "f1_macro": 0.3798913043478261,
+    "accuracy": 0.6904761904761905,
+    "f1_macro": 0.5873983739837398,
     "per_label": {
       "reported_event": {
-        "precision": 0.52,
-        "recall": 0.8666666666666667,
-        "f1": 0.65,
-        "support": 15
+        "precision": 0.5185185185185185,
+        "recall": 1.0,
+        "f1": 0.6829268292682927,
+        "support": 14
       },
       "perspective_explainer": {
         "precision": 0.0,
@@ -24,24 +24,24 @@
         "support": 8
       },
       "project_showcase": {
-        "precision": 0.0,
-        "recall": 0.0,
-        "f1": 0.0,
-        "support": 5
+        "precision": 1.0,
+        "recall": 0.5,
+        "f1": 0.6666666666666666,
+        "support": 10
       },
       "question_request": {
-        "precision": 0.7692307692307693,
+        "precision": 1.0,
         "recall": 1.0,
-        "f1": 0.8695652173913043,
+        "f1": 1.0,
         "support": 10
       }
     },
     "confusion": {
       "reported_event": {
-        "reported_event": 13,
+        "reported_event": 14,
         "perspective_explainer": 0,
         "project_showcase": 0,
-        "question_request": 2
+        "question_request": 0
       },
       "perspective_explainer": {
         "reported_event": 8,
@@ -50,10 +50,10 @@
         "question_request": 0
       },
       "project_showcase": {
-        "reported_event": 4,
+        "reported_event": 5,
         "perspective_explainer": 0,
-        "project_showcase": 0,
-        "question_request": 1
+        "project_showcase": 5,
+        "question_request": 0
       },
       "question_request": {
         "reported_event": 0,
@@ -64,18 +64,21 @@
     },
     "confidence": {
       "definition": "winning softmax probability; highest-ranked third",
-      "accuracy_most_confident_third": 0.9166666666666666,
-      "n_most_confident_third": 12
+      "mean_when_right": 0.4689486026763916,
+      "mean_when_wrong": 0.37371814250946045,
+      "accuracy_most_confident_third": 0.9285714285714286,
+      "accuracy_least_confident_third": 0.5,
+      "n_most_confident_third": 14
     },
     "provenance": {
-      "run_completed_utc": "2026-10-26T00:09:24.334354+00:00",
+      "run_completed_utc": "2026-10-26T00:56:09.030625+00:00",
       "dataset": "labels.csv",
-      "dataset_sha256": "0256ae767d974264ea9b525bffcd8c6e6f13349ceed6c9ccab9f43f4fbfaa31c",
-      "row_count": 250,
+      "dataset_sha256": "2014afa7a009d2a84d4ed25f7d60b4500dbfddfc59987707e00b3431441c301d",
+      "row_count": 280,
       "label_distribution": {
         "reported_event": 97,
         "perspective_explainer": 52,
-        "project_showcase": 35,
+        "project_showcase": 65,
         "question_request": 66
       },
       "labels": [
@@ -95,21 +98,21 @@
   },
   {
     "seed": 7,
-    "n_test": 38,
+    "n_test": 42,
     "test_distribution": {
       "question_request": 10,
-      "reported_event": 15,
-      "project_showcase": 5,
-      "perspective_explainer": 8
+      "reported_event": 14,
+      "perspective_explainer": 8,
+      "project_showcase": 10
     },
-    "accuracy": 0.631578947368421,
-    "f1_macro": 0.39800443458980045,
+    "accuracy": 0.6428571428571429,
+    "f1_macro": 0.5201465201465201,
     "per_label": {
       "reported_event": {
-        "precision": 0.5384615384615384,
-        "recall": 0.9333333333333333,
-        "f1": 0.6829268292682927,
-        "support": 15
+        "precision": 0.5,
+        "recall": 1.0,
+        "f1": 0.6666666666666666,
+        "support": 14
       },
       "perspective_explainer": {
         "precision": 0.0,
@@ -118,15 +121,15 @@
         "support": 8
       },
       "project_showcase": {
-        "precision": 0.0,
-        "recall": 0.0,
-        "f1": 0.0,
-        "support": 5
+        "precision": 1.0,
+        "recall": 0.3,
+        "f1": 0.46153846153846156,
+        "support": 10
       },
       "question_request": {
-        "precision": 0.8333333333333334,
+        "precision": 0.9090909090909091,
         "recall": 1.0,
-        "f1": 0.9090909090909091,
+        "f1": 0.9523809523809523,
         "support": 10
       }
     },
@@ -135,19 +138,19 @@
         "reported_event": 14,
         "perspective_explainer": 0,
         "project_showcase": 0,
-        "question_request": 1
+        "question_request": 0
       },
       "perspective_explainer": {
-        "reported_event": 7,
-        "perspective_explainer": 0,
-        "project_showcase": 0,
-        "question_request": 1
-      },
-      "project_showcase": {
-        "reported_event": 5,
+        "reported_event": 8,
         "perspective_explainer": 0,
         "project_showcase": 0,
         "question_request": 0
+      },
+      "project_showcase": {
+        "reported_event": 6,
+        "perspective_explainer": 0,
+        "project_showcase": 3,
+        "question_request": 1
       },
       "question_request": {
         "reported_event": 0,
@@ -158,18 +161,21 @@
     },
     "confidence": {
       "definition": "winning softmax probability; highest-ranked third",
+      "mean_when_right": 0.4247027635574341,
+      "mean_when_wrong": 0.309783935546875,
       "accuracy_most_confident_third": 1.0,
-      "n_most_confident_third": 12
+      "accuracy_least_confident_third": 0.35714285714285715,
+      "n_most_confident_third": 14
     },
     "provenance": {
-      "run_completed_utc": "2026-10-26T00:09:24.334354+00:00",
+      "run_completed_utc": "2026-10-26T00:56:09.030625+00:00",
       "dataset": "labels.csv",
-      "dataset_sha256": "0256ae767d974264ea9b525bffcd8c6e6f13349ceed6c9ccab9f43f4fbfaa31c",
-      "row_count": 250,
+      "dataset_sha256": "2014afa7a009d2a84d4ed25f7d60b4500dbfddfc59987707e00b3431441c301d",
+      "row_count": 280,
       "label_distribution": {
         "reported_event": 97,
         "perspective_explainer": 52,
-        "project_showcase": 35,
+        "project_showcase": 65,
         "question_request": 66
       },
       "labels": [
@@ -189,21 +195,21 @@
   },
   {
     "seed": 2024,
-    "n_test": 38,
+    "n_test": 42,
     "test_distribution": {
       "question_request": 10,
-      "reported_event": 15,
+      "reported_event": 14,
       "perspective_explainer": 8,
-      "project_showcase": 5
+      "project_showcase": 10
     },
-    "accuracy": 0.6578947368421053,
-    "f1_macro": 0.42102206736353076,
+    "accuracy": 0.6190476190476191,
+    "f1_macro": 0.5005952380952381,
     "per_label": {
       "reported_event": {
-        "precision": 0.5769230769230769,
-        "recall": 1.0,
-        "f1": 0.7317073170731707,
-        "support": 15
+        "precision": 0.5,
+        "recall": 0.9285714285714286,
+        "f1": 0.65,
+        "support": 14
       },
       "perspective_explainer": {
         "precision": 0.0,
@@ -212,10 +218,10 @@
         "support": 8
       },
       "project_showcase": {
-        "precision": 0.0,
-        "recall": 0.0,
-        "f1": 0.0,
-        "support": 5
+        "precision": 0.6,
+        "recall": 0.3,
+        "f1": 0.4,
+        "support": 10
       },
       "question_request": {
         "precision": 0.9090909090909091,
@@ -226,9 +232,9 @@
     },
     "confusion": {
       "reported_event": {
-        "reported_event": 15,
+        "reported_event": 13,
         "perspective_explainer": 0,
-        "project_showcase": 0,
+        "project_showcase": 1,
         "question_request": 0
       },
       "perspective_explainer": {
@@ -238,9 +244,9 @@
         "question_request": 0
       },
       "project_showcase": {
-        "reported_event": 4,
+        "reported_event": 6,
         "perspective_explainer": 0,
-        "project_showcase": 0,
+        "project_showcase": 3,
         "question_request": 1
       },
       "question_request": {
@@ -252,18 +258,21 @@
     },
     "confidence": {
       "definition": "winning softmax probability; highest-ranked third",
+      "mean_when_right": 0.4730946123600006,
+      "mean_when_wrong": 0.325639545917511,
       "accuracy_most_confident_third": 1.0,
-      "n_most_confident_third": 12
+      "accuracy_least_confident_third": 0.21428571428571427,
+      "n_most_confident_third": 14
     },
     "provenance": {
-      "run_completed_utc": "2026-10-26T00:09:24.334354+00:00",
+      "run_completed_utc": "2026-10-26T00:56:09.030625+00:00",
       "dataset": "labels.csv",
-      "dataset_sha256": "0256ae767d974264ea9b525bffcd8c6e6f13349ceed6c9ccab9f43f4fbfaa31c",
-      "row_count": 250,
+      "dataset_sha256": "2014afa7a009d2a84d4ed25f7d60b4500dbfddfc59987707e00b3431441c301d",
+      "row_count": 280,
       "label_distribution": {
         "reported_event": 97,
         "perspective_explainer": 52,
-        "project_showcase": 35,
+        "project_showcase": 65,
         "question_request": 66
       },
       "labels": [
